@@ -23,8 +23,8 @@ lverror.explain(1672)
 lverror.explain(999999)  # not a documented code
 # None
 
-info = lverror.describe(-200279)
-info.code  # -200279
+info = lverror.describe(-200300)
+info.code  # -200300
 info.message  # None (no public message for this specific code)
 info.family  # 'NI-DAQmx' (classified by its range)
 info.is_error  # True
@@ -142,7 +142,7 @@ is the interpretation most callers hit, and notes the alternative meaning where 
 LabVIEW's authoritative error/warning indicator is the `status` boolean in the error
 cluster, which a bare numeric code does not carry. Offline, `is_error` / `is_warning` apply
 the standard numeric convention (negative is an error, zero is success, positive is a
-warning), with the documented positive error codes of the legacy general and network
+warning), with the documented positive error codes of the legacy general, network, and DDE
 families reported as errors.
 
 ## Why

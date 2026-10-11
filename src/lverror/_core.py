@@ -51,8 +51,8 @@ def is_error(code: int) -> bool:
     LabVIEW's authoritative error/warning flag lives in the error cluster's ``status``
     boolean, which a bare code does not carry. Offline, this applies the standard numeric
     convention: negative codes are errors, ``0`` means success, and positive codes are
-    warnings, except for the documented positive error codes of the legacy general and
-    network families, which are reported as errors.
+    warnings, except for the documented positive error codes of the legacy general, network,
+    and DDE families, which are reported as errors.
     """
     if code < 0:
         return True
