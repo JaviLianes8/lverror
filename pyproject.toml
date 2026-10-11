@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lverror"
-version = "0.2.0"
+version = "0.3.0"
 description = "Offline lookup that turns a LabVIEW or NI error code into a human description, with no LabVIEW installed"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -19,6 +19,9 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = []
+
+[project.scripts]
+lverror = "lverror._cli:main"
 
 [project.optional-dependencies]
 dev = ["ruff", "mypy", "pytest", "build", "twine"]
