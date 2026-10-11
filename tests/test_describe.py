@@ -12,8 +12,8 @@ def test_describe_assembles_a_full_record_for_a_known_code() -> None:
 
 
 def test_describe_classifies_an_unknown_code_by_range_only() -> None:
-    info = lverror.describe(-200279)
-    assert info.code == -200279
+    info = lverror.describe(-200300)
+    assert info.code == -200300
     assert info.message is None
     assert info.family == "NI-DAQmx"
     assert info.is_error is True

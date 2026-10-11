@@ -9,14 +9,16 @@ in. No description is invented.
 
 from __future__ import annotations
 
-from ._core import ErrorInfo, describe, explain, is_error, is_warning
+from ._core import ErrorInfo, describe, explain, family, is_error, is_known, is_warning
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "ErrorInfo",
     "describe",
     "explain",
+    "family",
     "is_error",
+    "is_known",
     "is_warning",
 ]

@@ -8,7 +8,9 @@ PUBLIC_API: list[str] = [
     "ErrorInfo",
     "describe",
     "explain",
+    "family",
     "is_error",
+    "is_known",
     "is_warning",
 ]
 

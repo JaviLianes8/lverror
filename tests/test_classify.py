@@ -17,7 +17,7 @@ def test_visa_range_boundaries() -> None:
 
 
 def test_daqmx_range_classifies_an_undocumented_code() -> None:
-    info = lverror.describe(-200279)
+    info = lverror.describe(-200300)
     assert info.family == "NI-DAQmx"
     assert info.message is None
 
@@ -52,3 +52,23 @@ def test_undocumented_positive_codes_are_warnings_by_convention() -> None:
 def test_zero_is_neither_error_nor_warning() -> None:
     assert lverror.is_error(0) is False
     assert lverror.is_warning(0) is False
+
+
+def test_visa_completion_code_is_a_warning_not_an_error() -> None:
+    # 1073676294 is VISA's "bytes read equals the input count" completion, a warning.
+    assert lverror.is_warning(1073676294) is True
+    assert lverror.is_error(1073676294) is False
+
+
+def test_is_known_reports_documented_codes() -> None:
+    assert lverror.is_known(7) is True
+    assert lverror.is_known(-1073807339) is True
+    assert lverror.is_known(123456789) is False
+    assert lverror.is_known(0) is False
+
+
+def test_family_returns_the_range_name() -> None:
+    assert lverror.family(-1073807339) == "VISA"
+    assert lverror.family(-200279) == "NI-DAQmx"
+    assert lverror.family(-1700) == "AppleEvent"
+    assert lverror.family(123456789) is None

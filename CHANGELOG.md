@@ -6,6 +6,27 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0]
+
+### Added
+
+- `is_known(code)`: report whether the package ships a documented message for a code.
+- `family(code)`: return the documented range, or family, a code falls in, or `None`.
+- VISA completion and warning codes (the positive `0x3FFF` family), classified as warnings
+  rather than errors through a dedicated warning set so `is_warning` is accurate for them.
+- Error families that were not covered before: instrument driver, AppleEvent, PPC, DDE, and
+  the modern networking codes.
+
+### Changed
+
+- The baked-in dataset grows from 53 codes to 888 codes with verbatim or closely paraphrased
+  messages, covering the general LabVIEW codes (file I/O, memory, VI Server, .NET, Python,
+  classes, 3D, targets), the full NI-VISA completion and error set, common NI-DAQmx codes, and
+  the families listed above. No message is invented; codes absent from public sources are still
+  classified by range only.
+- Data is split across several range-scoped modules so each file stays small, and a merge guard
+  rejects any code defined in two modules.
+
 ## [0.1.0]
 
 ### Added

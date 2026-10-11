@@ -35,6 +35,16 @@ def explain(code: int) -> str | None:
     return MESSAGES.get(code)
 
 
+def is_known(code: int) -> bool:
+    """Report whether the package ships a documented message for the code."""
+    return code in MESSAGES
+
+
+def family(code: int) -> str | None:
+    """Return the documented range, or family, the code falls in, or ``None`` if outside all."""
+    return _family_of(code)
+
+
 def is_error(code: int) -> bool:
     """Report whether a code denotes an error.
 

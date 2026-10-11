@@ -21,6 +21,18 @@ def test_explain_knows_a_visa_code() -> None:
     assert lverror.explain(-1073807339) == "Timeout expired before operation completed."
 
 
+def test_explain_knows_a_daqmx_code() -> None:
+    assert lverror.explain(-200088) == "The task specified is invalid or does not exist."
+
+
+def test_explain_knows_an_instrument_driver_code() -> None:
+    assert lverror.explain(-1240) == "The instrument timed out."
+
+
+def test_explain_knows_a_dde_code() -> None:
+    assert lverror.explain(14001) == "Invalid refnum."
+
+
 def test_explain_returns_none_for_an_unknown_code() -> None:
     assert lverror.explain(123456789) is None
 

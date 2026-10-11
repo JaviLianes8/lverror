@@ -1,4 +1,10 @@
-from lverror._data import MESSAGES, POSITIVE_ERROR_CODES, RANGES
+from lverror._data import (
+    _PARTS,
+    MESSAGES,
+    POSITIVE_ERROR_CODES,
+    RANGES,
+    WARNING_CODES,
+)
 
 
 def test_no_message_is_empty() -> None:
@@ -11,8 +17,23 @@ def test_messages_use_no_em_or_en_dash() -> None:
     assert all(em_dash not in msg and en_dash not in msg for msg in MESSAGES.values())
 
 
-def test_every_positive_message_code_is_marked_an_error() -> None:
-    assert frozenset(c for c in MESSAGES if c > 0) == POSITIVE_ERROR_CODES
+def test_no_code_is_defined_in_two_data_modules() -> None:
+    assert sum(len(part) for part in _PARTS) == len(MESSAGES)
+
+
+def test_zero_carries_no_message() -> None:
+    assert 0 not in MESSAGES
+
+
+def test_positive_codes_split_into_errors_and_warnings() -> None:
+    positives = frozenset(c for c in MESSAGES if c > 0)
+    assert positives == POSITIVE_ERROR_CODES | WARNING_CODES
+    assert POSITIVE_ERROR_CODES.isdisjoint(WARNING_CODES)
+
+
+def test_warning_codes_are_the_visa_completion_family() -> None:
+    assert WARNING_CODES
+    assert all(c > 0 and c in MESSAGES for c in WARNING_CODES)
 
 
 def test_ranges_are_well_formed() -> None:
