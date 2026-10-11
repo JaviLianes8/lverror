@@ -6,6 +6,31 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0]
+
+### Added
+
+- `search(text)`: reverse lookup that returns the documented records whose message contains a
+  case-insensitive substring, sorted by code, with an optional `limit`.
+- `in_family(name)` and `families()`: enumerate the documented codes in a named family and
+  list the known family names.
+- `nearest(code)`: return the documented record numerically closest to a code.
+- `codes()` and `records()`: iterate every documented code, or its full `ErrorInfo`, in order.
+- `parse_code(text)`: parse a code in decimal or hex, applying the 32-bit two's-complement
+  convention so `0xBFFF0015` resolves to `-1073807339` as NI's Explain Error dialog shows it.
+- `format_line(code)`: render one record as a single human-readable line.
+- `TABLE`, an `ErrorTable` read-only `Mapping` from code to `ErrorInfo`, and `UnknownCodeError`
+  raised when an undocumented code is looked up on it.
+- A `lverror` command-line tool (console script and `python -m lverror`): single-code lookup
+  with hex input, `--search`, `--family`, `--list-families`, `--json`, and `--version`, with a
+  `--help` that carries runnable examples.
+
+### Changed
+
+- The contract test now asserts the behaviour of every public name, not only that it is
+  exported. Real end-to-end tests invoke the installed command through a subprocess and check
+  stdout and exit codes against golden fixtures of actual NI/LabVIEW codes.
+
 ## [0.2.0]
 
 ### Added

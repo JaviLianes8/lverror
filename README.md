@@ -20,28 +20,100 @@ lverror.explain(7)
 lverror.explain(1672)
 # 'There was an unknown Python error in the operation.'
 
-lverror.explain(999999)      # not a documented code
+lverror.explain(999999)  # not a documented code
 # None
 
 info = lverror.describe(-200279)
-info.code                    # -200279
-info.message                 # None  (no public message for this specific code)
-info.family                  # 'NI-DAQmx'  (classified by its range)
-info.is_error                # True
+info.code  # -200279
+info.message  # None (no public message for this specific code)
+info.family  # 'NI-DAQmx' (classified by its range)
+info.is_error  # True
 
-lverror.is_error(-1073807339)   # True  (a VISA timeout)
-lverror.is_warning(1073676294)  # True  (a VISA completion code, not an error)
-lverror.is_warning(200010)      # True  (positive, undocumented: a warning by convention)
-lverror.is_error(0)             # False (zero means success)
+lverror.is_error(-1073807339)  # True (a VISA timeout)
+lverror.is_warning(1073676294)  # True (a VISA completion code, not an error)
+lverror.is_warning(200010)  # True (positive, undocumented: a warning by convention)
+lverror.is_error(0)  # False (zero means success)
 
-lverror.is_known(7)             # True
-lverror.family(-1073807339)     # 'VISA'
+lverror.is_known(7)  # True
+lverror.family(-1073807339)  # 'VISA'
 ```
 
-`explain(code)` returns the documented description or `None`. `describe(code)` returns an
-`ErrorInfo` with the `code`, the `message` (if known), the `family` it falls in, and the
-`is_error` / `is_warning` flags. `is_error(code)`, `is_warning(code)`, `is_known(code)` and
-`family(code)` are also available on their own.
+### Search, families, and iteration
+
+```python
+import lverror
+
+# Reverse search: which code was the timeout one again?
+[rec.code for rec in lverror.search("timeout")]
+# [-1073807339, -200284, 65, 123]
+
+# Every documented code in one family.
+[rec.code for rec in lverror.in_family("DDE")][:3]
+# [14001, 14002, 14003]
+
+lverror.families()
+# ('VISA', 'NI-DAQmx', 'analysis VI', ... , 'general LabVIEW')
+
+# The nearest documented code to an undocumented one.
+lverror.nearest(-200300).code  # a real NI-DAQmx code near -200300
+
+# Parse the hex spelling NI's Explain Error dialog shows.
+lverror.parse_code("0xBFFF0015")  # -1073807339
+
+# One human line, for a log.
+lverror.format_line(7)
+# '7 (error, general LabVIEW): File not found. ...'
+
+# A dict-like view of every documented code.
+lverror.TABLE[7].message  # 'File not found. ...'
+len(lverror.TABLE)  # count of documented codes
+7 in lverror.TABLE  # True
+```
+
+`search(text)` returns the records whose message contains `text`, case-insensitively.
+`in_family(name)` and `families()` query the range table. `nearest(code)` returns the
+closest documented record. `codes()` and `records()` iterate the whole table. `parse_code`
+reads decimal or hex. `format_line` renders one line. `TABLE` is a read-only mapping from
+code to `ErrorInfo`; looking up an undocumented code on it raises `UnknownCodeError`, while
+`explain` and `describe` stay non-raising.
+
+## Command line
+
+The package installs a `lverror` command for the same lookups from a shell, offline.
+
+```
+$ lverror 7
+7 (error, general LabVIEW): File not found. ...
+
+$ lverror 0xBFFF0015
+-1073807339 (error, VISA): Timeout expired before operation completed.
+
+$ lverror --search timeout
+-1073807339 (error, VISA): Timeout expired before operation completed.
+...
+
+$ lverror --family DDE
+14001 (error, DDE): Invalid refnum.
+...
+
+$ lverror --list-families
+VISA
+NI-DAQmx
+...
+
+$ lverror 7 --json
+{
+  "code": 7,
+  "message": "File not found. ...",
+  "family": "general LabVIEW",
+  "is_error": true,
+  "is_warning": false
+}
+```
+
+It exits `0` when a lookup or search yields information, `1` when a code or search has no
+result, and `2` on bad input. Run `lverror --help` for the full list with examples. The tool
+also runs as `python -m lverror`.
 
 ## Coverage
 
