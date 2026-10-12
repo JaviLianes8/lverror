@@ -1,4 +1,7 @@
+import pytest
+
 import lverror
+from lverror import _data
 
 
 def test_search_is_case_insensitive_and_matches_the_message() -> None:
@@ -64,3 +67,19 @@ def test_every_record_in_a_family_classifies_to_that_family() -> None:
     for name in lverror.families():
         for rec in lverror.in_family(name):
             assert lverror.family(rec.code) == name
+
+
+def test_in_family_ignores_surrounding_whitespace() -> None:
+    assert lverror.in_family("  DDE \t") == lverror.in_family("DDE")
+
+
+def test_data_loader_refuses_a_duplicate_code() -> None:
+    raw = '{"messages": [[7, "labview-errors", "a"], [7, "labview-errors", "b"]]}'
+    with pytest.raises(ValueError, match="duplicate error code"):
+        _data._load(raw)
+
+
+def test_data_loader_marks_only_positive_visa_codes_as_warnings() -> None:
+    raw = '{"messages": [[1073676294, "visa-errors", "a"], [7, "labview-errors", "b"]]}'
+    messages, visa = _data._load(raw)
+    assert messages == {1073676294: "a", 7: "b"} and visa == frozenset({1073676294})

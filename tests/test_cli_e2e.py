@@ -116,3 +116,22 @@ def test_help_lists_runnable_examples() -> None:
     assert result.returncode == 0, result.stderr
     assert "Examples:" in result.stdout
     assert "lverror --search" in result.stdout
+
+
+def test_search_without_a_match_exits_one_and_prints_nothing() -> None:
+    result = run_cli("--search", "no such words anywhere")
+    assert (result.returncode, result.stdout, result.stderr) == (1, "", "")
+
+
+def test_undocumented_code_in_a_known_family_exits_zero() -> None:
+    result = run_cli("-200300")
+    assert result.returncode == 0, result.stderr
+    assert result.stdout == (
+        "-200300 (error, NI-DAQmx): no documented message, classified by range only\n"
+    )
+
+
+def test_unknown_family_exits_two() -> None:
+    result = run_cli("--family", "GPIB")
+    assert result.returncode == 2
+    assert result.stderr.startswith("lverror: unknown family 'GPIB'; known families are: VISA")

@@ -13,8 +13,7 @@ import json
 from importlib import resources
 
 
-def _load() -> tuple[dict[int, str], frozenset[int]]:
-    raw = resources.files(__package__).joinpath("_messages.json").read_text(encoding="utf-8")
+def _load(raw: str) -> tuple[dict[int, str], frozenset[int]]:
     messages: dict[int, str] = {}
     visa: set[int] = set()
     for code, source, text in json.loads(raw)["messages"]:
@@ -29,7 +28,9 @@ def _load() -> tuple[dict[int, str], frozenset[int]]:
 # code -> NI's description, from the sources named above.
 MESSAGES: dict[int, str]
 _VISA_CODES: frozenset[int]
-MESSAGES, _VISA_CODES = _load()
+MESSAGES, _VISA_CODES = _load(
+    resources.files(__package__).joinpath("_messages.json").read_text(encoding="utf-8")
+)
 
 # Positive codes that are warnings or completions, not errors (the VISA completion family).
 WARNING_CODES: frozenset[int] = frozenset(c for c in _VISA_CODES if c > 0)
