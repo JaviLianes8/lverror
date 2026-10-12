@@ -48,9 +48,10 @@ def parse_code(text: str) -> int:
     """Parse a user-supplied code in decimal or hexadecimal into the signed integer code.
 
     Decimal values are read as written, with an optional sign. Hexadecimal values take a
-    ``0x`` prefix, optionally signed; one in the unsigned 32-bit range above ``0x7FFFFFFF``
-    is read with the 32-bit two's-complement convention, so ``0xBFFF0015`` becomes
-    ``-1073807339``, matching how NI displays VISA codes. Surrounding whitespace is ignored.
+    ``0x`` or ``0X`` prefix, optionally signed; one in the unsigned 32-bit range above
+    ``0x7FFFFFFF`` is read with the 32-bit two's-complement convention, so ``0xBFFF0015``
+    becomes ``-1073807339``, matching how NI displays VISA codes. Surrounding whitespace is
+    ignored, and the code itself may be up to 64 characters long (leading zeros included).
     Anything else, or a value outside the signed 32-bit range, raises ``ValueError``; a
     non-``str`` argument raises ``TypeError``.
 
