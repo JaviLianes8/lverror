@@ -46,7 +46,7 @@ def explain(code: SupportsIndex) -> str | None:
     if it is outside the signed 32-bit range every LabVIEW error code fits in.
 
     >>> explain(-200088)
-    'The task is not valid or does not exist.'
+    'Either the requested task cannot be found or it is not a valid task.'
     >>> explain(-200300) is None
     True
     """

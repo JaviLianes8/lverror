@@ -6,12 +6,14 @@ The messages themselves are written for this library and are kept as they are. F
 this script records which captured source documents it (the NI-VISA error file for VISA codes,
 then the LabVIEW 2026 error file, the NI-PAL error file, the LabVIEW Wiki NI-DAQmx page and the
 1997 instrument driver table), refuses a message that repeats the source's wording (the same
-words after normalisation, or six or more consecutive words in common), and rewrites the list
+words after normalisation, six or more consecutive words in common, or a character similarity
+of 0.75 or more after normalisation), and rewrites the list
 of positive codes NI's LabVIEW file lists as errors. It never adds a code.
 """
 
 from __future__ import annotations
 
+import difflib
 import json
 import re
 from pathlib import Path
@@ -120,6 +122,10 @@ def main() -> int:
         if (
             _words(text) == _words(str(theirs))
             or _shared_run(_words(text), _words(str(theirs))) >= 6
+            or difflib.SequenceMatcher(
+                None, " ".join(_words(text)), " ".join(_words(str(theirs)))
+            ).ratio()
+            >= 0.75
         ):
             raise ValueError(f"the message for {code} repeats the wording of {source}")
         entries.append([code, source, text])

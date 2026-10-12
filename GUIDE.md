@@ -44,8 +44,8 @@ code twice, the description gives both meanings, joined by `Also:`:
 import lverror
 
 assert lverror.explain(65) == (
-    "The serial port timed out because no bytes were received. "
-    "Also: The network connection has already been established."
+    "No bytes arrived at the serial port before it timed out. "
+    "Also: A network connection is in place already."
 )
 ```
 

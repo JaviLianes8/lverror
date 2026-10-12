@@ -11,6 +11,7 @@ common. The parser locates each entry by the ``(Hex 0x...)`` tag computed from t
 
 from __future__ import annotations
 
+import difflib
 import json
 import re
 from pathlib import Path
@@ -106,6 +107,10 @@ def test_every_shipped_code_is_documented_by_a_captured_source() -> None:
     assert len(MESSAGES) == 888
 
 
+def _similarity(ours: str, theirs: str) -> float:
+    return difflib.SequenceMatcher(None, " ".join(_words(ours)), " ".join(_words(theirs))).ratio()
+
+
 def test_no_message_repeats_the_wording_of_its_source() -> None:
     expected = _expected()
     same = [c for c, text in MESSAGES.items() if _words(text) == _words(expected[c])]
@@ -114,12 +119,30 @@ def test_no_message_repeats_the_wording_of_its_source() -> None:
         c for c, text in MESSAGES.items() if _shared_run(_words(text), _words(expected[c])) >= 6
     ]
     assert long_runs == []
+    close = [c for c, text in MESSAGES.items() if _similarity(text, expected[c]) >= 0.75]
+    assert close == []
+
+
+def test_no_message_repeats_a_sentence_of_any_captured_entry() -> None:
+    # Across codes, short stock phrases ("does not match the data type") are fine; eight
+    # consecutive words would be a copied sentence.
+    grams: set[tuple[str, ...]] = set()
+    for text in _expected().values():
+        words = _words(text)
+        grams.update(tuple(words[i : i + 8]) for i in range(len(words) - 7))
+    hits = []
+    for code, text in MESSAGES.items():
+        words = _words(text)
+        if any(tuple(words[i : i + 8]) in grams for i in range(len(words) - 7)):
+            hits.append(code)
+    assert hits == []
 
 
 def test_the_overlap_check_bites() -> None:
     theirs = _words("Timeout expired before operation completed.")
     assert _words("timeout EXPIRED, before operation completed") == theirs
     assert _shared_run(_words("a b c d e f g"), _words("x b c d e f g y")) == 6
+    assert _similarity("The pen does not exist.", "Pen does not exist.") >= 0.75
 
 
 def test_every_entry_is_tagged_with_the_source_that_documents_it() -> None:

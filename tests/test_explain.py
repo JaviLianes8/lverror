@@ -10,8 +10,8 @@ def test_explain_returns_the_message_for_a_known_general_code() -> None:
 
 def test_explain_knows_the_short_common_codes() -> None:
     assert (
-        lverror.explain(2) == "No memory is left. Also: the Windows status ERROR_FILE_NOT_FOUND, "
-        "meaning a file was not found."
+        lverror.explain(2) == "There is no free memory left. Also: A file could not be found "
+        "(status ERROR_FILE_NOT_FOUND)."
     )
     assert lverror.explain(42) == "An unspecified error occurred."
 
@@ -27,7 +27,10 @@ def test_explain_knows_a_visa_code() -> None:
 
 
 def test_explain_knows_a_daqmx_code() -> None:
-    assert lverror.explain(-200088) == "The task is not valid or does not exist."
+    assert (
+        lverror.explain(-200088)
+        == "Either the requested task cannot be found or it is not a valid task."
+    )
 
 
 def test_explain_knows_an_instrument_driver_code() -> None:
