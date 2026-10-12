@@ -48,8 +48,8 @@ class ErrorTable(Mapping[int, ErrorInfo]):
     including ``bool`` and non-integer keys. Iteration yields the documented codes in
     ascending order. Use the shared :data:`TABLE` instance.
 
-    >>> TABLE[14001].message
-    'Invalid refnum.'
+    >>> isinstance(TABLE, ErrorTable), TABLE[14001].message
+    (True, 'Invalid refnum.')
     >>> 7 in TABLE, -200300 in TABLE, TABLE.get(-200300)
     (True, False, None)
     """

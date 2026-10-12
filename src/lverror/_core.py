@@ -19,8 +19,8 @@ class ErrorInfo:
     Instances are immutable, compare by value and are hashable.
 
     >>> info = describe(-1073807339)
-    >>> info.message
-    'Timeout expired before operation completed.'
+    >>> isinstance(info, ErrorInfo), info.message
+    (True, 'Timeout expired before operation completed.')
     >>> (info.code, info.family, info.is_error, info.is_warning)
     (-1073807339, 'VISA', True, False)
     """

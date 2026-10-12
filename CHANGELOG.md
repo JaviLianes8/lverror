@@ -6,6 +6,45 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-12
+
+The public API is now stable: the names in `lverror.__all__`, their signatures, the five
+`ErrorInfo` fields, the family names and their order, the error types listed below, and the
+command-line options and exit codes. Message text follows NI's sources and may change when
+NI changes it.
+
+### Changed
+
+- Every message is now NI's own text, word for word. 0.3.0 shipped 888 messages of which
+  only 224 matched NI exactly; the rest were shortened or reworded, and a few described a
+  different error (VISA -1073807239, for example). The text now comes from the error files
+  LabVIEW 2026 and NI-VISA install, the LabVIEW Wiki NI-DAQmx page and NI's 1997 instrument
+  driver table, captured with their origin and checksum in `tests/fixtures/sources`. The set
+  of 888 codes is unchanged.
+- Codes NI lists twice keep both meanings, joined by `Also:` (2 and 61 to 65).
+- The VISA family now covers every VISA code (`0xBFFF0000` to `0xBFFFFFFF` and the
+  completion codes `0x3FFF0000` to `0x3FFFFFFF`); 34 documented VISA codes, including all the
+  completion codes, used to report no family.
+- The NI-DAQmx family now spans -239999 to -200000 and 200000 to 239999 (was 209999), and the
+  general LabVIEW family 1 to 16999 (was 16000), matching the codes NI documents.
+- Functions that take a code refuse `bool`, floats and strings with `TypeError` and values
+  outside the signed 32-bit range with `ValueError`; they used to return `None` or `False`
+  for any key. Integer-like values (an `IntEnum`, a NumPy integer) are accepted, and the code
+  parameters are annotated `SupportsIndex`.
+- `parse_code` accepts only ASCII decimal or `0x` hexadecimal text with an optional sign,
+  and refuses values outside the signed 32-bit range; underscores, other Unicode digits and
+  out-of-range values used to slip through. Error messages never repeat long input.
+- `search` refuses a non-`str` query and a negative or non-integer `limit`, and matches with
+  `str.casefold`. `in_family` refuses a non-`str` name.
+- `TABLE` treats `bool` and non-integer keys as missing (`True in TABLE` was `True`).
+- The command line refuses two actions in one call (a code with `--search`, for example)
+  with exit code 2 instead of silently running one of them.
+
+### Added
+
+- Doctested examples on every public name, a guide (`GUIDE.md`), and contract, ground
+  truth, fuzz and end-to-end tests that drive the installed command.
+
 ## [0.3.0]
 
 ### Added

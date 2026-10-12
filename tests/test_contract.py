@@ -5,8 +5,11 @@ it a real behavioural check below as the library grows; the test fails if the mo
 list disagree, or if any promised behaviour regresses.
 """
 
+import dataclasses
 import importlib.resources
+import re
 from collections.abc import Mapping
+from pathlib import Path
 
 import lverror
 
@@ -156,3 +159,39 @@ def test_unknown_code_error_promise() -> None:
         pass
     else:
         raise AssertionError("TABLE should raise UnknownCodeError for an undocumented code")
+
+
+def test_version_matches_pyproject() -> None:
+    text = (Path(__file__).resolve().parent.parent / "pyproject.toml").read_text("utf-8")
+    match = re.search(r'^version = "([^"]+)"$', text, re.MULTILINE)
+    assert match is not None
+    assert match.group(1) == lverror.__version__
+
+
+def test_package_has_no_runtime_dependencies_and_is_stable() -> None:
+    text = (Path(__file__).resolve().parent.parent / "pyproject.toml").read_text("utf-8")
+    assert re.search(r"^dependencies = \[\]$", text, re.MULTILINE)
+    assert "Development Status :: 5 - Production/Stable" in text
+    for minor in range(10, 15):
+        assert f"Programming Language :: Python :: 3.{minor}" in text
+
+
+def test_the_data_file_ships_inside_the_package() -> None:
+    assert importlib.resources.files("lverror").joinpath("_messages.json").is_file()
+
+
+def test_error_info_has_exactly_the_five_stable_fields() -> None:
+    names = [field.name for field in dataclasses.fields(lverror.ErrorInfo)]
+    assert names == ["code", "message", "family", "is_error", "is_warning"]
+    info = lverror.describe(7)
+    assert hash(info) == hash(lverror.describe(7)) and info == lverror.describe(7)
+
+
+def test_every_documented_record_is_consistent() -> None:
+    for info in lverror.records():
+        assert info.message is not None and info.message == info.message.strip()
+        assert "\n" not in info.message and "  " not in info.message
+        assert chr(0x2014) not in info.message
+        assert info.is_error != info.is_warning
+        assert lverror.TABLE[info.code] == info == lverror.describe(info.code)
+    assert lverror.explain(0) is None and 0 not in lverror.TABLE
