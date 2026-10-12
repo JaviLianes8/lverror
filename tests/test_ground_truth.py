@@ -22,8 +22,9 @@ import lverror
 from lverror._data import MESSAGES
 
 SOURCES = Path(__file__).parent / "fixtures" / "sources"
-if not SOURCES.is_dir():
-    pytest.skip("the captured NI sources are not distributed", allow_module_level=True)
+if not (SOURCES / "labview-errors.xml").is_file():
+    # The NI texts are kept on the maintainer's machine only (scripts/capture_sources.py).
+    pytest.skip("the captured NI sources are not present", allow_module_level=True)
 INSTALLED = {
     "labview-errors": Path(
         "C:/Program Files/National Instruments/LabVIEW 2026/resource/errors/English/"

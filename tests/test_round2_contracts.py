@@ -15,7 +15,7 @@ _FIXTURE = Path(__file__).parent / "fixtures" / "sources" / "labview-positive-co
 
 def _fixture_errors() -> set[int]:
     if not _FIXTURE.is_file():
-        pytest.skip("the captured NI sources are not distributed")
+        pytest.skip("the captured NI sources are not present")
     pairs = (line.split() for line in _FIXTURE.read_text(encoding="utf-8").splitlines())
     return {int(code) for code, kind in pairs if kind == "error"}
 

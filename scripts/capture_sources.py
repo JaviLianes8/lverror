@@ -145,6 +145,36 @@ def _manual(manifest: list[dict[str, object]]) -> None:
             "with its soft-hyphen minus signs written as ASCII hyphen-minus"
         )
         manifest.append(_record(source_id, MANUAL_URL, data, note))
+    _pairs(data)
+
+
+def _pairs(data: bytes) -> None:
+    # pdftotext -raw keeps each row of Table 5 together, so codes and descriptions pair up.
+    with tempfile.TemporaryDirectory() as tmp:
+        pdf = Path(tmp) / "manual.pdf"
+        pdf.write_bytes(data)
+        raw = subprocess.run(
+            ["pdftotext", "-raw", str(pdf), "-"], capture_output=True, check=True
+        ).stdout.decode("latin-1")
+    raw = raw.replace("\xad", "-")
+    title = "Table 5. Instrument Driver Error Codes"
+    start = raw.index(title, raw.index(title) + 1)
+    block = raw[start : raw.index("-13xx", start)]
+    block = re.sub(
+        r"Instrument Driver Initialize VI|Instrument Driver VI|VISA Transition Library", "", block
+    )
+    flat = " ".join(block.split())
+    found = re.findall(r"(-1[23]\d\d) (.*?)(?= -1[23]\d\d |$)", flat)
+    doc = {
+        "label": (
+            "parsed from pdftotext -raw output of Table 5, where each row keeps its code and "
+            "description together; the -layout excerpt in instrument-driver-1997.txt shows the "
+            "same table with its columns out of line"
+        ),
+        "pairs": [[int(code), text.strip()] for code, text in found],
+    }
+    text = json.dumps(doc, indent=1) + "\n"
+    (OUT / "instrument-driver-1997-pairs.json").write_text(text, encoding="utf-8", newline="\n")
 
 
 def _ranges(manifest: list[dict[str, object]]) -> None:

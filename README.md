@@ -60,9 +60,12 @@ the [changelog](https://github.com/JaviLianes8/lverror/blob/main/CHANGELOG.md).
 ## Where the descriptions come from
 
 The messages are written for this library, matching the meaning of NI's error descriptions;
-they are not NI's text. Each shipped code is one NI documents, and the test suite checks every
-message against a copy of the NI source kept with the tests (not distributed): the code must
-be there, and the message must not repeat NI's wording. The sources are:
+they are not NI's text. Each shipped code is one NI documents. The maintainer keeps a local
+copy of the NI sources (it is not in this repository or in the package; `MANIFEST.json` in
+`tests/fixtures/sources` records each origin, size and SHA-256), and with it the test suite
+checks every message: the code must be there, and the message must not repeat NI's wording.
+[CONTRIBUTING](https://github.com/JaviLianes8/lverror/blob/main/CONTRIBUTING.md) explains how
+to re-create the copy. The sources are:
 
 - 729 codes from the error file LabVIEW 2026 installs (`LabVIEW-errors.txt`), 99 VISA codes
   from the NI-VISA error file and 2 from the NI-PAL error file.

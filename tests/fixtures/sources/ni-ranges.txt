@@ -1,1 +1,0 @@
-You can define custom error codes in the range of –8999 through –8000, 5000 through 9999, or 500,000 through 599,999. Some numeric error codes are used by more than one group of VIs and functions. For example, error 65 is both a serial error code, indicating a serial port timeout, and a networking error code, indicating that a network connection is already established.

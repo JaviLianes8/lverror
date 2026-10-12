@@ -21,8 +21,9 @@ any release.
   reworded messages, some of which no longer matched NI's current meaning (VISA -1073807239,
   for example, now describes the secure-connection error the installed NI-VISA file names).
   Each description was checked against NI's sources (the error files LabVIEW 2026, NI-VISA and
-  NI-PAL install, the LabVIEW Wiki NI-DAQmx page and NI's 1997 instrument driver table), which
-  the tests keep as references; they are not distributed. The set of 888 codes is unchanged.
+  NI-PAL install, the LabVIEW Wiki NI-DAQmx page and NI's 1997 instrument driver table), kept
+  as local test references only: they are neither in the repository nor in the package. The
+  set of 888 codes is unchanged.
 - Code 2 now gives both of the meanings NI documents for it, joined by `Also:`, as 61 to 65
   already did.
 - `is_error` reports every positive code NI's LabVIEW 2026 error file lists as an error
