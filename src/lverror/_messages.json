@@ -194,7 +194,7 @@
 [-1200, "instrument-driver-1997", "The syntax string is not valid."],
 [-932, "labview-errors", "Authentication is needed before the destination port can be used."],
 [-931, "labview-errors", "The given name for the location is wrong."],
-[-930, "labview-errors", "ppcServiceRealTime was not the service method requested."],
+[-930, "labview-errors", "The method requested for the service was not ppcServiceRealTime."],
 [-928, "labview-errors", "The user reference number is not valid."],
 [-927, "labview-errors", "The password supplied for the user is incorrect."],
 [-926, "labview-errors", "PPCStart did not succeed because no inform was pending at the destination."],
