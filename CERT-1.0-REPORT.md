@@ -23,7 +23,7 @@ Progress:
 | 3 | Docstring with runnable example, doctests pass | PASS | `test_docs` (every module doctested, every name has `>>>` and appears in an example); README and GUIDE blocks and `$ lverror` transcripts executed |
 | 4 | Typed end to end | PASS | `mypy --strict src tests` exit 0; `py.typed` in the wheel; external strict consumer clean (lens a) |
 | 5 | Typed, documented, safe errors | PASS | `test_validation`, `test_round2_contracts`, `test_round4_contracts`: messages bounded for 10 MB strings and 100000-bit integers, failing reprs handled |
-| 6 | Contract asserts the full promise | PASS | 383 tests; a promise test per public name plus boundary contracts from five blind rounds |
+| 6 | Contract asserts the full promise | PASS | 384 tests; a promise test per public name plus boundary contracts from five blind rounds |
 | 7 | Real ground truth | PASS | 888 of 888 messages equal NI's text in the error files LabVIEW 2026, NI-VISA and NI-PAL install on this PC (830), the LabVIEW Wiki DAQmx page (41) and NI's 1997 manual (17, hand-paired and labelled); excerpts with size, SHA-256 and date in `MANIFEST.json`; NI docs pages used as an independent oracle by lens b |
 | 8 | Real e2e incl. PyPI upgrade | PASS | Wheel in clean venvs, suite from the sdist with `src` removed, a sabotaged installed CLI fails 18 of 20 CLI tests (the other two only check for no traceback), PyPI 0.3.0 upgraded in place matches CHANGELOG (lens d, reviewer) |
 | 9 | Seeded fuzz, no crash, hang or blow-up | PASS | `test_fuzz.py` (seed 20261012) against brute-force references; lens c: 780000 random string calls, linear scaling to 10 million characters, 8-thread consistency |
@@ -32,7 +32,7 @@ Progress:
 | 12 | CHANGELOG dated 1.0.0 | PASS | `## [1.0.0] - 2026-10-12` with the stable surface and every behaviour change |
 | 13 | pyproject | PASS | 1.0.0, Production/Stable, 3.10 to 3.14, MIT, Homepage/Source/Issues/Changelog, keywords, `dependencies = []` (contract-tested) |
 | 14 | sdist and wheel contents | PASS | Wheel: modules, data file, `py.typed`, LICENSE, NOTICE; sdist adds tests, fixtures and the two data scripts; NOTICE covers the NI text and the CC BY 3.0 wiki data |
-| 15 | Gates exit 0 alone | PASS | `ruff format --check .` 0, `ruff check .` 0, `mypy --strict src` 0, `pytest` 0 (383 passed), each run alone |
+| 15 | Gates exit 0 alone | PASS | `ruff format --check .` 0, `ruff check .` 0, `mypy --strict src` 0, `pytest` 0 (384 passed), each run alone |
 | 16 | Independent reviewer | PASS | items 1 to 18 PASS at 0a4dfc8, no failures |
 | 17 | PR, trace guard | ready | see the end of this report; merge and PyPI publish are left to the maintainer |
 | 18 | Mutation round | PASS | author round: 34 mutations, 4 survivors closed, 1 equivalent; blind lens (e): five rounds, 165 new mutations, every non-equivalent survivor closed |
@@ -126,7 +126,7 @@ round first re-applied the previous round's survivors and confirmed them killed.
 | 2 | 18c77cb | 30 | 18 | 3 | 9 | `tests/test_round2_contracts.py` |
 | 3 | 60546d2 | 27 | 19 | 2 | 6 | `tests/test_round3_contracts.py` |
 | 4 | 0a4dfc8 | 21 | 11 | 3 | 7 | `tests/test_round4_contracts.py` |
-| 5 | 762acbf | 14 | 10 | 3 | 1 | `test_round4_contracts::test_usage_names_the_program_lverror` |
+| 5 | 762acbf | 14 | 10 | 3 | 1 | `test_round4_contracts::test_module_form_usage_names_the_program_lverror` |
 | total | | 165 | 120 | 12 | 33, all closed | |
 
 Equivalent mutations, with the reason: the warning set built from every source except the
@@ -155,7 +155,7 @@ the first item 16 reviewer were cut by a usage limit and relaunched fresh.
 | b. Correctness and ground truth | FAIL (1 medium, 4 low, 2 info) | 888 of 888 messages verified, but 369 positive codes NI lists were reported as warnings because their text is not shipped; provenance wording; manifest silent on two excerpt edits; case of bold tags | PASS at 18c77cb: the 1026-code error list equals its own derivation from the installed file, 0 mismatches in 43077 classification cases, 888 of 888 messages |
 | c. Adversarial and robustness | FAIL (2 medium, 3 low, 3 info) | traceback when the reader closes the pipe; deadline traceback lost under capture; long `UnknownCodeError` repr; lying `str` subclasses; negative-hex hint | PASS at d586272: closed pipes quiet in 12 runs, deadline traceback visible without `-s`, fuzz regression clean; accepted: a stdlib-named file in the current directory shadows imports (ordinary Python path behaviour), exceptions from a caller's own `__index__` propagate (documented) |
 | d. Packaging and real e2e | FAIL (1 medium, 1 low, 3 info) | no notice for the NI text and the CC BY 3.0 wiki data; unknown-family exit code wording | PASS at 5af5bb2: NOTICE in both artifacts, 359 passed from the sdist on 3.10 to 3.14 against the installed wheel, sdist install, 0.3.0 upgrade matches CHANGELOG |
-| e. Contract strength | FAIL (10 survivors) | five blind rounds, see above | PASS after the round 5 contract (973c075); the lens judged the surface exhausted |
+| e. Contract strength | FAIL (10 survivors) | five blind rounds, see above | PASS once the round 5 contract runs the module form (R12 re-applied and killed); the lens judged the surface exhausted |
 | Item 16 reviewer | PASS | items 1 to 18 PASS at 0a4dfc8 (17 pending), no failures | PASS |
 
 ## Decisions for the maintainer

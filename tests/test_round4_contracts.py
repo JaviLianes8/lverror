@@ -110,3 +110,14 @@ def test_usage_names_the_program_lverror() -> None:
     assert result.returncode == 2
     assert result.stderr.startswith("usage: lverror [-h]")
     assert run_cli("--help").stdout.startswith("usage: lverror [-h]")
+
+
+def test_module_form_usage_names_the_program_lverror() -> None:
+    env = dict(os.environ)
+    package_parent = str(Path(lverror.__file__).resolve().parent.parent)
+    env["PYTHONPATH"] = package_parent + os.pathsep + env.get("PYTHONPATH", "")
+    result = subprocess.run(
+        [sys.executable, "-m", "lverror", "--bogus"], capture_output=True, text=True, env=env
+    )
+    assert result.returncode == 2
+    assert result.stderr.startswith("usage: lverror [-h]")
