@@ -5,15 +5,23 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from ._data import MESSAGES, POSITIVE_ERROR_CODES, RANGES
+from ._validate import as_code
 
 
 @dataclass(frozen=True)
 class ErrorInfo:
     """What is known about one LabVIEW or NI error code.
 
-    ``message`` is ``None`` when no public source documents the code. ``family`` names the
-    documented range the code falls in, or is ``None`` when the code sits outside every
-    known range.
+    ``message`` is NI's text for the code, or ``None`` when no captured NI source documents
+    it. ``family`` names the range the code falls in, or is ``None`` when the code sits
+    outside every known range. ``is_error`` and ``is_warning`` follow :func:`is_error`.
+    Instances are immutable, compare by value and are hashable.
+
+    >>> info = describe(-1073807339)
+    >>> info.message
+    'Timeout expired before operation completed.'
+    >>> (info.code, info.family, info.is_error, info.is_warning)
+    (-1073807339, 'VISA', True, False)
     """
 
     code: int
@@ -31,18 +39,35 @@ def _family_of(code: int) -> str | None:
 
 
 def explain(code: int) -> str | None:
-    """Return the documented description for a code, or ``None`` if the code is not known."""
-    return MESSAGES.get(code)
+    """Return NI's description of a code, or ``None`` if no captured source documents it.
+
+    Raises ``TypeError`` if ``code`` is not an integer (``bool`` included) and ``ValueError``
+    if it is outside the signed 32-bit range every LabVIEW error code fits in.
+
+    >>> explain(-200088)
+    'Task specified is invalid or does not exist.'
+    >>> explain(-200300) is None
+    True
+    """
+    return MESSAGES.get(as_code(code))
 
 
 def is_known(code: int) -> bool:
-    """Report whether the package ships a documented message for the code."""
-    return code in MESSAGES
+    """Report whether the package ships NI's message for the code.
+
+    >>> is_known(7), is_known(-200300)
+    (True, False)
+    """
+    return as_code(code) in MESSAGES
 
 
 def family(code: int) -> str | None:
-    """Return the documented range, or family, the code falls in, or ``None`` if outside all."""
-    return _family_of(code)
+    """Return the range, or family, the code falls in, or ``None`` if it is outside all.
+
+    >>> family(-200300), family(65), family(1073676294), family(-3)
+    ('NI-DAQmx', 'network', 'VISA', None)
+    """
+    return _family_of(as_code(code))
 
 
 def is_error(code: int) -> bool:
@@ -53,23 +78,38 @@ def is_error(code: int) -> bool:
     convention: negative codes are errors, ``0`` means success, and positive codes are
     warnings, except for the documented positive error codes of the legacy general, network,
     and DDE families, which are reported as errors.
+
+    >>> is_error(-1073807339), is_error(7), is_error(1073676294), is_error(0)
+    (True, True, False, False)
     """
-    if code < 0:
+    checked = as_code(code)
+    if checked < 0:
         return True
-    return code in POSITIVE_ERROR_CODES
+    return checked in POSITIVE_ERROR_CODES
 
 
 def is_warning(code: int) -> bool:
-    """Report whether a code denotes a warning (see :func:`is_error` for the convention)."""
-    return code > 0 and code not in POSITIVE_ERROR_CODES
+    """Report whether a code denotes a warning (see :func:`is_error` for the convention).
+
+    >>> is_warning(1073676294), is_warning(200010), is_warning(7), is_warning(0)
+    (True, True, False, False)
+    """
+    checked = as_code(code)
+    return checked > 0 and checked not in POSITIVE_ERROR_CODES
 
 
 def describe(code: int) -> ErrorInfo:
-    """Return everything known about a code: its message, family, and classification."""
+    """Return everything known about a code: its message, family, and classification.
+
+    >>> info = describe(-200300)
+    >>> info.message is None, info.family, info.is_error
+    (True, 'NI-DAQmx', True)
+    """
+    checked = as_code(code)
     return ErrorInfo(
-        code=code,
-        message=MESSAGES.get(code),
-        family=_family_of(code),
-        is_error=is_error(code),
-        is_warning=is_warning(code),
+        code=checked,
+        message=MESSAGES.get(checked),
+        family=_family_of(checked),
+        is_error=is_error(checked),
+        is_warning=is_warning(checked),
     )

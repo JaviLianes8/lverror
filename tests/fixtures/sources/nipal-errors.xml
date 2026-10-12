@@ -1,0 +1,8 @@
+<nidocument>
+<nierror code="-50251">
+The specified software component is not available. The component was not loaded.
+</nierror>
+<nierror code="-50103">
+The specified resource is reserved. The operation could not be completed as specified.
+</nierror>
+</nidocument>

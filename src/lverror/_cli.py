@@ -1,7 +1,8 @@
 """The ``lverror`` command-line tool: look up a code, search, or list a family, offline.
 
 Exit codes: ``0`` when the lookup or search yields information, ``1`` when a code or a search
-has no result, and ``2`` on bad input. Pass ``--json`` for machine-readable output.
+has no result, and ``2`` on bad input, including two actions in one run. Pass ``--json`` for
+machine-readable output.
 """
 
 from __future__ import annotations
@@ -34,10 +35,12 @@ def _build_parser() -> argparse.ArgumentParser:
         epilog=_EXAMPLES,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("code", nargs="?", help="a code in decimal (7) or hex (0xBFFF0015)")
-    parser.add_argument("--search", metavar="TEXT", help="list codes whose message contains TEXT")
-    parser.add_argument("--family", metavar="NAME", help="list documented codes in a family")
-    parser.add_argument(
+    # One action per run: a code, a search, a family or the family list.
+    action = parser.add_mutually_exclusive_group()
+    action.add_argument("code", nargs="?", help="a code in decimal (7) or hex (0xBFFF0015)")
+    action.add_argument("--search", metavar="TEXT", help="list codes whose message contains TEXT")
+    action.add_argument("--family", metavar="NAME", help="list documented codes in a family")
+    action.add_argument(
         "--list-families", action="store_true", help="list the known family names and exit"
     )
     parser.add_argument("--json", action="store_true", help="emit JSON instead of text")

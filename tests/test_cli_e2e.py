@@ -22,7 +22,7 @@ GOLDEN: list[tuple[str, str]] = [
     ("0xBFFF0015", "Timeout expired before operation completed."),
     ("-1073807339", "Timeout expired before operation completed."),
     ("14001", "Invalid refnum."),
-    ("-200088", "The task specified is invalid or does not exist."),
+    ("-200088", "Task specified is invalid or does not exist."),
 ]
 
 

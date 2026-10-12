@@ -9,7 +9,7 @@ def test_explain_returns_the_message_for_a_known_general_code() -> None:
 
 
 def test_explain_knows_the_short_common_codes() -> None:
-    assert lverror.explain(2) == "Memory is full."
+    assert lverror.explain(2) == "Memory is full. Also: ERROR_FILE_NOT_FOUND."
     assert lverror.explain(42) == "Generic error."
 
 
@@ -22,11 +22,11 @@ def test_explain_knows_a_visa_code() -> None:
 
 
 def test_explain_knows_a_daqmx_code() -> None:
-    assert lverror.explain(-200088) == "The task specified is invalid or does not exist."
+    assert lverror.explain(-200088) == "Task specified is invalid or does not exist."
 
 
 def test_explain_knows_an_instrument_driver_code() -> None:
-    assert lverror.explain(-1240) == "The instrument timed out."
+    assert lverror.explain(-1240) == "Instrument timed out"
 
 
 def test_explain_knows_a_dde_code() -> None:
