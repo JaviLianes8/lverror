@@ -12,7 +12,7 @@ Progress:
 - [x] Version bump to 1.0.0
 - [x] Independent reviewer and five QA lenses report PASS (items 16, 19)
 - [x] Gates (item 15)
-- [ ] PR and trace guard (item 17); merge and publish pending
+- [x] PR and trace guard (item 17); merge and publish pending
 
 ## Scorecard (author)
 
@@ -34,7 +34,7 @@ Progress:
 | 14 | sdist and wheel contents | PASS | Wheel: modules, data file, `py.typed`, LICENSE, NOTICE; sdist adds tests, fixtures and the two data scripts; NOTICE covers the NI text and the CC BY 3.0 wiki data |
 | 15 | Gates exit 0 alone | PASS | `ruff format --check .` 0, `ruff check .` 0, `mypy --strict src` 0, `pytest` 0 (384 passed), each run alone |
 | 16 | Independent reviewer | PASS | items 1 to 18 PASS at 0a4dfc8, no failures |
-| 17 | PR, trace guard | ready | see the end of this report; merge and PyPI publish are left to the maintainer |
+| 17 | PR, trace guard | ready | PR #3 from `release/1.0.0`, trace guard CLEAN; merge and PyPI publish are left to the maintainer |
 | 18 | Mutation round | PASS | author round: 34 mutations, 4 survivors closed, 1 equivalent; blind lens (e): five rounds, 165 new mutations, every non-equivalent survivor closed |
 | 19 | Five QA lenses | PASS | a, b, c, d, e all PASS after their findings were fixed and re-verified |
 
@@ -155,7 +155,7 @@ the first item 16 reviewer were cut by a usage limit and relaunched fresh.
 | b. Correctness and ground truth | FAIL (1 medium, 4 low, 2 info) | 888 of 888 messages verified, but 369 positive codes NI lists were reported as warnings because their text is not shipped; provenance wording; manifest silent on two excerpt edits; case of bold tags | PASS at 18c77cb: the 1026-code error list equals its own derivation from the installed file, 0 mismatches in 43077 classification cases, 888 of 888 messages |
 | c. Adversarial and robustness | FAIL (2 medium, 3 low, 3 info) | traceback when the reader closes the pipe; deadline traceback lost under capture; long `UnknownCodeError` repr; lying `str` subclasses; negative-hex hint | PASS at d586272: closed pipes quiet in 12 runs, deadline traceback visible without `-s`, fuzz regression clean; accepted: a stdlib-named file in the current directory shadows imports (ordinary Python path behaviour), exceptions from a caller's own `__index__` propagate (documented) |
 | d. Packaging and real e2e | FAIL (1 medium, 1 low, 3 info) | no notice for the NI text and the CC BY 3.0 wiki data; unknown-family exit code wording | PASS at 5af5bb2: NOTICE in both artifacts, 359 passed from the sdist on 3.10 to 3.14 against the installed wheel, sdist install, 0.3.0 upgrade matches CHANGELOG |
-| e. Contract strength | FAIL (10 survivors) | five blind rounds, see above | PASS once the round 5 contract runs the module form (R12 re-applied and killed); the lens judged the surface exhausted |
+| e. Contract strength | FAIL (10 survivors) | five blind rounds, see above | PASS at 3e32a41: R12 re-applied and killed, every non-equivalent mutation of all five rounds killed; the lens judged the surface exhausted |
 | Item 16 reviewer | PASS | items 1 to 18 PASS at 0a4dfc8 (17 pending), no failures | PASS |
 
 ## Decisions for the maintainer
