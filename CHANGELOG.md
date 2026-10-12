@@ -25,20 +25,26 @@ NI changes it.
 - The VISA family now covers every VISA code (`0xBFFF0000` to `0xBFFFFFFF` and the
   completion codes `0x3FFF0000` to `0x3FFFFFFF`); 34 documented VISA codes, including all the
   completion codes, used to report no family.
-- The NI-DAQmx family now spans -239999 to -200000 and 200000 to 239999 (was 209999), and the
-  general LabVIEW family 1 to 16999 (was 16000), matching the codes NI documents.
+- The NI-DAQmx family now spans -239999 to -200000 and 200000 to 239999 (was -209999 to
+  -200000 and 200000 to 209999), and the general LabVIEW family 1 to 16999 (was 16000),
+  matching the codes NI documents.
 - Functions that take a code refuse `bool`, floats and strings with `TypeError` and values
-  outside the signed 32-bit range with `ValueError`; they used to return `None` or `False`
-  for any key. Integer-like values (an `IntEnum`, a NumPy integer) are accepted, and the code
-  parameters are annotated `SupportsIndex`.
+  outside the signed 32-bit range with `ValueError`. In 0.3.0 `True` and `7.0` were looked up
+  as codes 1 and 7, strings and `None` failed with an unrelated comparison `TypeError` in most
+  functions, and out-of-range integers were classified (`is_warning(2**31)` was `True`).
+  Integer-like values (an `IntEnum`, a NumPy integer) are accepted, the code parameters are
+  annotated `SupportsIndex`, and `ErrorInfo.code` is always a plain `int` (0.3.0 stored the
+  argument as given).
 - `parse_code` accepts only ASCII decimal or `0x` hexadecimal text with an optional sign,
   and refuses values outside the signed 32-bit range; underscores, other Unicode digits and
   out-of-range values used to slip through. Error messages never repeat long input.
-- `search` refuses a non-`str` query and a negative or non-integer `limit`, and matches with
-  `str.casefold`. `in_family` refuses a non-`str` name.
-- `TABLE` treats `bool` and non-integer keys as missing (`True in TABLE` was `True`).
+- `search` refuses a non-`str` query and a negative or non-integer `limit` (`limit=True` used
+  to mean 1), and matches with `str.casefold`. `in_family` refuses a non-`str` name.
+- `TABLE` treats `bool` and non-integer keys as missing (`True in TABLE` was `True`), accepts
+  integer-like keys, and `UnknownCodeError` shows a short form of a long or huge key.
 - The command line refuses two actions in one call (a code with `--search`, for example)
-  with exit code 2 instead of silently running one of them.
+  with exit code 2 instead of silently running one of them, and out-of-range or malformed
+  codes such as `1_000` exit 2 (they used to exit 0 or 1).
 
 ### Added
 

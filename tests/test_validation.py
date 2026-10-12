@@ -150,4 +150,17 @@ def test_table_treats_non_codes_as_missing(key: object) -> None:
 
 def test_table_accepts_integer_like_keys() -> None:
     assert Index(7) in lverror.TABLE  # type: ignore[comparison-overlap]
-    assert lverror.TABLE[Index(7)] == lverror.TABLE[7]  # type: ignore[index]
+    assert lverror.TABLE[Index(7)] == lverror.TABLE[7]
+
+
+def test_unknown_code_error_message_stays_short() -> None:
+    for key in (10**5000, "x" * 1_000_000, -200300):
+        with pytest.raises(lverror.UnknownCodeError) as caught:
+            lverror.TABLE[key]  # type: ignore[index]
+        assert len(str(caught.value)) < 60
+        assert caught.value.args == (key,)
+    assert str(lverror.UnknownCodeError(-200300)) == "-200300"
+
+
+def test_table_index_type_accepts_integer_like_keys_statically() -> None:
+    assert lverror.TABLE[Index(14001)].message == "Invalid refnum."

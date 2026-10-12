@@ -11,7 +11,13 @@ _SHOWN = 40
 
 def shorten(value: object) -> str:
     """Return a short ``repr`` of user input for an error message, never the whole of it."""
-    text = repr(value)
+    if isinstance(value, int) and value.bit_length() > 64:
+        # A huge integer cannot even be printed cheaply (Python caps int-to-str conversion).
+        return f"<int of {value.bit_length()} bits>"
+    try:
+        text = repr(value)
+    except Exception:
+        return f"<{type(value).__name__} object>"
     if len(text) <= _SHOWN:
         return text
     return text[: _SHOWN - 3] + "..."

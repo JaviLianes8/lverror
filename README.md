@@ -84,11 +84,14 @@ instrument driver, AppleEvent, PPC, DDE and networking codes a Python caller usu
   `nidaqmx` package ships the DAQmx code names (`nidaqmx.error_codes`), not their text.
 - [PyVISA](https://pypi.org/project/PyVISA/) ships offline descriptions of the VISA status
   codes, and only those: no general LabVIEW, NI-DAQmx or networking codes.
+- [lvkit](https://pypi.org/project/lvkit/), a toolkit for converting LabVIEW VIs to Python
+  (alpha, with runtime dependencies such as pydantic, networkx and pylabview), includes a
+  table of about 1300 LabVIEW error messages. It has no NI-DAQmx codes and no family or
+  error/warning classification.
 - [error-manager](https://pypi.org/project/error-manager/) manages codes you define yourself
   and ships none of NI's. The LabVIEW file parsers
-  ([pylabview](https://pypi.org/project/pylabview/),
-  [pylavi](https://pypi.org/project/pylavi/), [lvkit](https://pypi.org/project/lvkit/)) read
-  `.vi` files, not error codes.
+  [pylabview](https://pypi.org/project/pylabview/) and
+  [pylavi](https://pypi.org/project/pylavi/) read `.vi` files, not error codes.
 
 `lverror` runs wherever Python runs, with nothing else installed, which suits CI runners, log
 and data pipelines, and test-rig tooling that never has LabVIEW.

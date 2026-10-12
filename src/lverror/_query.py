@@ -57,8 +57,10 @@ def records() -> Iterator[ErrorInfo]:
 def search(text: str, *, limit: SupportsIndex | None = None) -> list[ErrorInfo]:
     """Return documented records whose message contains ``text``, case-insensitively.
 
-    Results are sorted by code. Pass ``limit`` (zero or more) to cap the number returned. An
-    empty or whitespace-only query returns an empty list rather than every record. A
+    Surrounding whitespace in ``text`` is ignored, and both sides are compared with
+    :meth:`str.casefold` (so ``"ß"`` also matches ``"ss"``). Results are sorted by code. Pass
+    ``limit`` (zero or more) to cap the number returned. An empty or whitespace-only query
+    returns an empty list rather than every record. A
     non-``str`` query or a non-integer ``limit`` raises ``TypeError``; a negative ``limit``
     raises ``ValueError``.
 

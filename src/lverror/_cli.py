@@ -1,7 +1,8 @@
 """The ``lverror`` command-line tool: look up a code, search, or list a family, offline.
 
-Exit codes: ``0`` when the lookup or search yields information, ``1`` when a code or a search
-has no result, and ``2`` on bad input, including two actions in one run. Pass ``--json`` for
+Exit codes: ``0`` when the lookup, search or family listing yields information, ``1`` when a
+code, a search or a family has no result, and ``2`` on bad input, including two actions in
+one run. Pass ``--json`` for
 machine-readable output.
 """
 

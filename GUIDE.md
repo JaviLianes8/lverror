@@ -102,7 +102,8 @@ assert not lverror.is_error(0) and not lverror.is_warning(0)
 `families()` lists the family names in table order; `in_family(name)` returns the documented
 records of one family, matching the name case-insensitively, and raises `ValueError` for an
 unknown name. A code shared by two families reports the more specific one: the network
-range wins over general LabVIEW for 53 to 66.
+range wins over general LabVIEW for 53 to 66. Three families (analysis VI, data acquisition
+VI and user-defined) classify codes but ship no messages, so `in_family` returns `[]` for them.
 
 ```python
 import lverror
@@ -209,8 +210,8 @@ assert lverror.format_line(0) == "0 (success, unknown family): no documented inf
 
 The `lverror` command (also `python -m lverror`) runs one action per call: a code, `--search
 TEXT`, `--family NAME` or `--list-families`; add `--json` for machine output. It exits `0`
-when it finds information, `1` when a code or a search finds none, and `2` on bad input,
-including two actions at once.
+when it finds information, `1` when a code, a search or a family finds none, and `2` on bad
+input, including two actions at once.
 
 ```
 $ lverror 14001
@@ -237,5 +238,5 @@ DDE
 general LabVIEW
 ```
 
-A negative hex code that argparse would take for an option goes after `--`:
+Before Python 3.13, argparse takes a negative hex code for an option; put it after `--`:
 `lverror -- -0x10`.

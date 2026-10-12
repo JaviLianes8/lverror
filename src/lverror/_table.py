@@ -11,16 +11,18 @@ from __future__ import annotations
 
 import operator
 from collections.abc import Iterator, Mapping
+from typing import SupportsIndex
 
 from ._core import ErrorInfo, describe
 from ._data import MESSAGES
+from ._validate import shorten
 
 
 class UnknownCodeError(KeyError):
     """Raised when a key that is not a documented code is looked up in an ``ErrorTable``.
 
     It is a ``KeyError``, so ``TABLE.get(code)`` and ``code in TABLE`` work as with a dict.
-    ``args[0]`` is the key that was looked up.
+    ``args[0]`` is the key that was looked up; the message shows at most a short form of it.
 
     >>> try:
     ...     TABLE[-200300]
@@ -28,6 +30,9 @@ class UnknownCodeError(KeyError):
     ...     exc.args[0]
     -200300
     """
+
+    def __str__(self) -> str:
+        return shorten(self.args[0]) if self.args else ""
 
 
 def _member(key: object) -> int | None:
@@ -59,7 +64,7 @@ class ErrorTable(Mapping[int, ErrorInfo]):
     def __init__(self) -> None:
         self._codes: tuple[int, ...] = tuple(sorted(MESSAGES))
 
-    def __getitem__(self, code: int) -> ErrorInfo:
+    def __getitem__(self, code: SupportsIndex) -> ErrorInfo:
         member = _member(code)
         if member is None:
             raise UnknownCodeError(code)
