@@ -88,3 +88,14 @@ at once, 4 survived and were killed by new contracts on re-application, 1 equiva
 - PyPI 0.3.0 installed, then upgraded in place to the 1.0.0 wheel: `explain(-200088)` changes
   to NI's exact text, `family(1073676294)` from `None` to `VISA`, `explain(True)` from a
   message to `TypeError`, as CHANGELOG 1.0.0 lists.
+
+## QA lenses, first round (in progress)
+
+| Lens | First verdict | Findings | Status |
+| --- | --- | --- | --- |
+| a. API and docs | FAIL (1 high, 1 medium, 4 low) | README said lvkit has no error table (it ships about 1300 messages); `--family` exit code 1 undocumented and three families ship no messages; `TABLE[...]` typed `int` only; CHANGELOG incomplete against 0.3.0; `UnknownCodeError` message unbounded; search normalisation undocumented | fixed in 63d2fd6, re-verification pending |
+| b. Correctness and ground truth | FAIL (1 medium, 4 low, 2 info) | 888 of 888 messages verified against the installed NI files, the fetched wiki page and the 1997 PDF; but 369 positive codes NI lists as errors were reported as warnings because their text is not shipped; provenance wording; manifest silent on two excerpt edits | fixed in e71d4db (positive codes NI lists ship as numbers only), re-verification pending |
+| c. Adversarial and robustness | cut by a usage limit | none reported | relaunched |
+| d. Packaging and real e2e | cut by a usage limit | none reported | relaunched |
+| e. Contract strength | FAIL (10 survivors of 73) | blind round: range edges, source tags, `0X`, 64-character cap, query stripping, limit check order, CLI with no action, empty family exit code | contracts added in 23bc805, second round pending |
+| Item 16 reviewer | cut by a usage limit | none reported | relaunched |
