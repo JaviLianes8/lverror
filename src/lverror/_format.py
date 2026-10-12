@@ -8,6 +8,7 @@ form NI's Explain Error dialog shows for VISA codes.
 from __future__ import annotations
 
 import re
+from typing import SupportsIndex
 
 from ._core import describe
 from ._validate import INT32_MAX, INT32_MIN, as_text, shorten
@@ -18,7 +19,7 @@ _HEX = re.compile(r"[+-]?0[xX][0-9A-Fa-f]+")
 _LONGEST = 64
 
 
-def format_line(code: int) -> str:
+def format_line(code: SupportsIndex) -> str:
     """Return a one-line summary of a code: ``<code> (<severity>, <family>): <message>``.
 
     The severity is ``error``, ``warning`` or ``success``. An undocumented code still reports

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import operator
 from collections.abc import Iterator
+from typing import SupportsIndex
 
 from ._core import ErrorInfo, describe
 from ._data import MESSAGES, RANGES
@@ -53,7 +54,7 @@ def records() -> Iterator[ErrorInfo]:
         yield describe(code)
 
 
-def search(text: str, *, limit: int | None = None) -> list[ErrorInfo]:
+def search(text: str, *, limit: SupportsIndex | None = None) -> list[ErrorInfo]:
     """Return documented records whose message contains ``text``, case-insensitively.
 
     Results are sorted by code. Pass ``limit`` (zero or more) to cap the number returned. An
@@ -112,7 +113,7 @@ def in_family(name: str) -> list[ErrorInfo]:
     return [rec for rec in records() if rec.family == canonical]
 
 
-def nearest(code: int) -> ErrorInfo:
+def nearest(code: SupportsIndex) -> ErrorInfo:
     """Return the documented record whose code is numerically nearest ``code``.
 
     An exact match returns that record. On a tie the lower code wins. The table always holds

@@ -149,5 +149,5 @@ def test_table_treats_non_codes_as_missing(key: object) -> None:
 
 
 def test_table_accepts_integer_like_keys() -> None:
-    assert Index(7) in lverror.TABLE
+    assert Index(7) in lverror.TABLE  # type: ignore[comparison-overlap]
     assert lverror.TABLE[Index(7)] == lverror.TABLE[7]  # type: ignore[index]

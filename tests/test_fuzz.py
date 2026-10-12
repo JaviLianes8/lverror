@@ -6,6 +6,7 @@ library's own helpers, over thousands of seeded random inputs.
 
 from __future__ import annotations
 
+import contextlib
 import random
 import string
 import time
@@ -72,7 +73,7 @@ def test_parse_code_round_trips_decimal_and_hex() -> None:
 
 def test_parse_code_random_text_raises_only_value_error() -> None:
     rng = random.Random(SEED)
-    alphabet = string.printable + "٣ −﻿"
+    alphabet = string.printable + "".join(map(chr, (0x0663, 0x00A0, 0x2212, 0xFEFF)))
     for _ in range(20000):
         text = "".join(rng.choice(alphabet) for _ in range(rng.randint(0, 14)))
         try:
@@ -106,8 +107,6 @@ def test_lookups_stay_fast_on_hostile_input() -> None:
     start = time.perf_counter()
     lverror.search("q" * 1_000_000)
     for text in ("9" * 1_000_000, "0x" + "f" * 1_000_000, " " * 1_000_000 + "7"):
-        try:
+        with contextlib.suppress(ValueError):
             lverror.parse_code(text)
-        except ValueError:
-            pass
     assert time.perf_counter() - start < 5

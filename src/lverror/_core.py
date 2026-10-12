@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import SupportsIndex
 
 from ._data import MESSAGES, POSITIVE_ERROR_CODES, RANGES
 from ._validate import as_code
@@ -38,7 +39,7 @@ def _family_of(code: int) -> str | None:
     return None
 
 
-def explain(code: int) -> str | None:
+def explain(code: SupportsIndex) -> str | None:
     """Return NI's description of a code, or ``None`` if no captured source documents it.
 
     Raises ``TypeError`` if ``code`` is not an integer (``bool`` included) and ``ValueError``
@@ -52,7 +53,7 @@ def explain(code: int) -> str | None:
     return MESSAGES.get(as_code(code))
 
 
-def is_known(code: int) -> bool:
+def is_known(code: SupportsIndex) -> bool:
     """Report whether the package ships NI's message for the code.
 
     >>> is_known(7), is_known(-200300)
@@ -61,7 +62,7 @@ def is_known(code: int) -> bool:
     return as_code(code) in MESSAGES
 
 
-def family(code: int) -> str | None:
+def family(code: SupportsIndex) -> str | None:
     """Return the range, or family, the code falls in, or ``None`` if it is outside all.
 
     >>> family(-200300), family(65), family(1073676294), family(-3)
@@ -70,7 +71,7 @@ def family(code: int) -> str | None:
     return _family_of(as_code(code))
 
 
-def is_error(code: int) -> bool:
+def is_error(code: SupportsIndex) -> bool:
     """Report whether a code denotes an error.
 
     LabVIEW's authoritative error/warning flag lives in the error cluster's ``status``
@@ -88,7 +89,7 @@ def is_error(code: int) -> bool:
     return checked in POSITIVE_ERROR_CODES
 
 
-def is_warning(code: int) -> bool:
+def is_warning(code: SupportsIndex) -> bool:
     """Report whether a code denotes a warning (see :func:`is_error` for the convention).
 
     >>> is_warning(1073676294), is_warning(200010), is_warning(7), is_warning(0)
@@ -98,7 +99,7 @@ def is_warning(code: int) -> bool:
     return checked > 0 and checked not in POSITIVE_ERROR_CODES
 
 
-def describe(code: int) -> ErrorInfo:
+def describe(code: SupportsIndex) -> ErrorInfo:
     """Return everything known about a code: its message, family, and classification.
 
     >>> info = describe(-200300)
