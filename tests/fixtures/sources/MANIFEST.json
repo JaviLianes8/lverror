@@ -1,0 +1,76 @@
+{
+  "sources": [
+    {
+      "id": "labview-errors",
+      "origin": "C:\\Program Files\\National Instruments\\LabVIEW 2026\\resource\\errors\\English\\LabVIEW-errors.txt",
+      "bytes": 359814,
+      "sha256": "499924af568df32dee2038aaa87d7ab8fbb30e394d0dae4edc9f90ce2a781fb2",
+      "retrieved": "2026-10-12",
+      "note": "excerpt: the <nierror> entries of the shipped codes, verbatim with LF line ends"
+    },
+    {
+      "id": "visa-errors",
+      "origin": "C:\\Program Files\\National Instruments\\Shared\\Errors\\English\\VISA-errors.txt",
+      "bytes": 15688,
+      "sha256": "e1859360f23cce548620eb81aedcc53a5aab5c0674b4b03494758e233b404cd9",
+      "retrieved": "2026-10-12",
+      "note": "excerpt: the <nierror> entries of the shipped codes, verbatim with LF line ends"
+    },
+    {
+      "id": "nipal-errors",
+      "origin": "C:\\Program Files\\National Instruments\\Shared\\Errors\\English\\nipal-errors.txt",
+      "bytes": 27104,
+      "sha256": "dfcee41eecfb7a9ca146a4535c9314c66df629867d525f757809223c80b7ebb1",
+      "retrieved": "2026-10-12",
+      "note": "excerpt: the <nierror> entries of the shipped codes, verbatim with LF line ends"
+    },
+    {
+      "id": "labview-positive-codes",
+      "origin": "C:\\Program Files\\National Instruments\\LabVIEW 2026\\resource\\errors\\English\\LabVIEW-errors.txt",
+      "bytes": 359814,
+      "sha256": "499924af568df32dee2038aaa87d7ab8fbb30e394d0dae4edc9f90ce2a781fb2",
+      "retrieved": "2026-10-12",
+      "note": "derived: every positive code of the LabVIEW file, marked warning when its text contains the word warning, otherwise error"
+    },
+    {
+      "id": "daqmx-wiki",
+      "origin": "https://labviewwiki.org/w/index.php?title=NI-DAQmx_Error_Code_Family&action=raw",
+      "bytes": 1102348,
+      "sha256": "37d0e1de8a7408aa5c9357aea2dc81c654834a13da4c98f1ca259c5828acd59b",
+      "retrieved": "2026-10-12",
+      "note": "excerpt: the wikitext rows of the shipped NI-DAQmx codes, verbatim, joined by |- and closed with an added |}"
+    },
+    {
+      "id": "wiki-families",
+      "origin": "https://labviewwiki.org/w/index.php?title=List_of_errors&action=raw",
+      "bytes": 925586,
+      "sha256": "1bc89e63e637017e5927aa3bd23c442cf7bfeecf17a94901dd4f7e9ab6cd992c",
+      "retrieved": "2026-10-12",
+      "note": "excerpt: the LabVIEW, NI-DAQmx and VISA rows of the family range table"
+    },
+    {
+      "id": "instrument-driver-1997",
+      "origin": "https://www.apexwaves.com/pdf/manuals/SC-2040/archived--labview-error-codes.pdf",
+      "bytes": 1533783,
+      "sha256": "248defdd6122cc813be6e3480972adc081c88db4a6080a50b57ec84a0447cd7a",
+      "retrieved": "2026-10-12",
+      "note": "excerpt: from 'Table 5. Instrument Driver Error Codes' to 'Instrument-specific error', as extracted by pdftotext -layout, with its soft-hyphen minus signs written as ASCII hyphen-minus"
+    },
+    {
+      "id": "ranges-1997",
+      "origin": "https://www.apexwaves.com/pdf/manuals/SC-2040/archived--labview-error-codes.pdf",
+      "bytes": 1533783,
+      "sha256": "248defdd6122cc813be6e3480972adc081c88db4a6080a50b57ec84a0447cd7a",
+      "retrieved": "2026-10-12",
+      "note": "excerpt: from 'Error Code Range' to 'DDE Error Codes', as extracted by pdftotext -layout, with its soft-hyphen minus signs written as ASCII hyphen-minus"
+    },
+    {
+      "id": "ni-ranges",
+      "origin": "https://www.ni.com/docs/en-US/bundle/labview-api-ref/page/errors/ranges-of-labview-error-codes.html",
+      "bytes": 213000,
+      "sha256": "4cd26cd152faa8cd03edd085bc29ec118f9fe3df148ffbaa452d63eb70641336",
+      "retrieved": "2026-10-12",
+      "note": "excerpt: the custom-range and shared-code sentences of the page text"
+    }
+  ]
+}

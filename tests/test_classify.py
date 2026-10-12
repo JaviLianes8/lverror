@@ -7,7 +7,7 @@ def test_general_labview_family_covers_its_range() -> None:
 
 
 def test_above_the_general_range_has_no_family() -> None:
-    assert lverror.describe(16001).family is None
+    assert lverror.describe(17000).family is None
 
 
 def test_visa_range_boundaries() -> None:

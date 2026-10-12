@@ -5,7 +5,7 @@ def test_describe_assembles_a_full_record_for_a_known_code() -> None:
     info = lverror.describe(7)
     assert info.code == 7
     assert info.message is not None
-    assert info.message.startswith("File not found")
+    assert info.message.startswith("The file could not be found")
     assert info.family == "general LabVIEW"
     assert info.is_error is True
     assert info.is_warning is False

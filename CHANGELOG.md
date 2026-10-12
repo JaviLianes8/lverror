@@ -6,6 +6,58 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-12
+
+The public API is now stable: the names in `lverror.__all__`, their signatures, the five
+`ErrorInfo` fields, the family names and their order, the error types listed below, and the
+command-line options and exit codes. The wording of the descriptions may still be improved in
+any release.
+
+### Changed
+
+- The descriptions are written for this library, matching the meaning of NI's error
+  descriptions without reusing NI's wording: 885 of the 888 are rewritten, and the other 3
+  were already in the library's own words. 0.3.0 mixed text close to NI's with shortened or
+  reworded messages, some of which no longer matched NI's current meaning (VISA -1073807239,
+  for example, now describes the secure-connection error the installed NI-VISA file names).
+  Each description was checked against NI's sources (the error files LabVIEW 2026, NI-VISA and
+  NI-PAL install, the LabVIEW Wiki NI-DAQmx page and NI's 1997 instrument driver table), kept
+  as local test references only: they are neither in the repository nor in the package. The
+  set of 888 codes is unchanged.
+- Code 2 now gives both of the meanings NI documents for it, joined by `Also:`, as 61 to 65
+  already did.
+- `is_error` reports every positive code NI's LabVIEW 2026 error file lists as an error
+  (unless NI's text calls it a warning) even when its text is not shipped; 0.3.0 reported 369
+  of them, such as 1612, as warnings. The list ships as code numbers only.
+- The VISA family now covers every VISA code (`0xBFFF0000` to `0xBFFFFFFF` and the
+  completion codes `0x3FFF0000` to `0x3FFFFFFF`); 34 documented VISA codes, including all the
+  completion codes, used to report no family.
+- The NI-DAQmx family now spans -239999 to -200000 and 200000 to 239999 (was -209999 to
+  -200000 and 200000 to 209999), and the general LabVIEW family 1 to 16999 (was 16000),
+  matching the codes NI documents.
+- Functions that take a code refuse `bool`, floats and strings with `TypeError` and values
+  outside the signed 32-bit range with `ValueError`. In 0.3.0 `True` and `7.0` were looked up
+  as codes 1 and 7, strings and `None` failed with an unrelated comparison `TypeError` in most
+  functions, and out-of-range integers were classified (`is_warning(2**31)` was `True`).
+  Integer-like values (an `IntEnum`, a NumPy integer) are accepted, the code parameters are
+  annotated `SupportsIndex`, and `ErrorInfo.code` is always a plain `int` (0.3.0 stored the
+  argument as given).
+- `parse_code` accepts only ASCII decimal or `0x` hexadecimal text with an optional sign,
+  and refuses values outside the signed 32-bit range; underscores, other Unicode digits and
+  out-of-range values used to slip through. Error messages never repeat long input.
+- `search` refuses a non-`str` query and a negative or non-integer `limit` (`limit=True` used
+  to mean 1), and matches with `str.casefold`. `in_family` refuses a non-`str` name.
+- `TABLE` treats `bool` and non-integer keys as missing (`True in TABLE` was `True`), accepts
+  integer-like keys, and `UnknownCodeError` shows a short form of a long or huge key.
+- The command line refuses two actions in one call (a code with `--search`, for example)
+  with exit code 2 instead of silently running one of them, and out-of-range or malformed
+  codes such as `1_000` exit 2 (they used to exit 0 or 1).
+
+### Added
+
+- Doctested examples on every public name, a guide (`GUIDE.md`), and contract, ground
+  truth, fuzz and end-to-end tests that drive the installed command.
+
 ## [0.3.0]
 
 ### Added

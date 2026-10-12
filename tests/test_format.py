@@ -4,7 +4,7 @@ import lverror
 def test_format_line_for_a_documented_error() -> None:
     line = lverror.format_line(7)
     assert line.startswith("7 (error, general LabVIEW): ")
-    assert "File not found" in line
+    assert "file could not be found" in line
 
 
 def test_format_line_for_a_warning() -> None:
@@ -54,4 +54,4 @@ def test_parse_code_rejects_garbage() -> None:
 
 def test_parse_code_round_trips_a_real_visa_code_into_explain() -> None:
     code = lverror.parse_code("0xBFFF0015")
-    assert lverror.explain(code) == "Timeout expired before operation completed."
+    assert lverror.explain(code) == "The operation did not finish before the timeout elapsed."

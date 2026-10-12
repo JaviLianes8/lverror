@@ -1,135 +1,159 @@
-"""Real end-to-end tests: run the shipped ``lverror`` command as a user does.
+"""Real end-to-end tests: run the ``lverror`` command of the package under test as a user does.
 
-No mocks and no importing the functions under test. Each test spawns a fresh process and
-checks the real stdout, stderr, and exit code against golden fixtures of actual NI/LabVIEW
-codes and their documented text. Both the installed console script (when present on PATH) and
-``python -m lverror`` are exercised, so the packaged entry point is covered.
+Each test spawns a fresh process (the console script installed next to the test interpreter,
+or ``python -m lverror``) and checks the real stdout, stderr and exit code against the shipped
+descriptions written out here in full. No mocks, nothing installed.
 """
 
 from __future__ import annotations
 
 import json
-import shutil
+import os
 import subprocess
 import sys
+from pathlib import Path
 
 import pytest
+from _cli_command import cli_command, run_cli
 
-# Golden fixtures: real NI/LabVIEW codes paired with a stable fragment of their documented
-# text. These come from the baked-in dataset, which is compiled from public NI sources.
-GOLDEN: list[tuple[str, str]] = [
-    ("7", "File not found"),
-    ("0xBFFF0015", "Timeout expired before operation completed."),
-    ("-1073807339", "Timeout expired before operation completed."),
-    ("14001", "Invalid refnum."),
-    ("-200088", "The task specified is invalid or does not exist."),
+import lverror
+
+_FILE_NOT_FOUND = (
+    "The file could not be found. It may have been moved or removed. Check that the path is "
+    "right using a file explorer or the command prompt."
+)
+_TIMEOUT = "The operation did not finish before the timeout elapsed."
+_COMPLETION = (
+    "The transfer moved exactly the number of bytes requested. There may be more data waiting."
+)
+
+GOLDEN: list[tuple[str, int, str]] = [
+    ("7", 7, _FILE_NOT_FOUND),
+    ("0xBFFF0015", -1073807339, _TIMEOUT),
+    ("-1073807339", -1073807339, _TIMEOUT),
+    ("14001", 14001, "The refnum is not valid."),
+    ("1073676294", 1073676294, _COMPLETION),
 ]
 
 
-def _module_is_importable() -> bool:
-    probe = subprocess.run(
-        [sys.executable, "-c", "import lverror"],
-        capture_output=True,
-        timeout=60,
-        check=False,
+@pytest.mark.parametrize(("raw", "code", "text"), GOLDEN, ids=[g[0] for g in GOLDEN])
+def test_lookup_prints_the_description_and_exits_zero(raw: str, code: int, text: str) -> None:
+    result = run_cli(raw)
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.endswith(f": {text}\n")
+    assert result.stdout.startswith(f"{code} (")
+
+
+def test_module_form_runs_the_same_tool() -> None:
+    env = dict(os.environ)
+    package_parent = str(Path(lverror.__file__).resolve().parent.parent)
+    env["PYTHONPATH"] = package_parent + os.pathsep + env.get("PYTHONPATH", "")
+    result = subprocess.run(
+        [sys.executable, "-m", "lverror", "7"], capture_output=True, text=True, env=env
     )
-    return probe.returncode == 0
-
-
-def _commands() -> list[tuple[str, list[str]]]:
-    commands: list[tuple[str, list[str]]] = []
-    script = shutil.which("lverror")
-    if script is not None:
-        commands.append(("console-script", [script]))
-    # The module form is only exercised where the package is importable under the test
-    # interpreter, so a multi-interpreter machine does not report a false failure.
-    if _module_is_importable():
-        commands.append(("module", [sys.executable, "-m", "lverror"]))
-    return commands
-
-
-COMMANDS = _commands()
-IDS = [name for name, _ in COMMANDS]
-PREFIXES = [argv for _, argv in COMMANDS]
-
-
-def _run(prefix: list[str], *args: str) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        [*prefix, *args],
-        capture_output=True,
-        text=True,
-        timeout=60,
-        check=False,
-    )
-
-
-def test_a_console_script_is_installed() -> None:
-    # The e2e suite is only meaningful if the packaged command exists. This asserts the
-    # project did install its console script, so the suite cannot silently cover nothing.
-    assert shutil.which("lverror") is not None, "install the package (pip install -e .) first"
-
-
-@pytest.mark.parametrize("prefix", PREFIXES, ids=IDS)
-@pytest.mark.parametrize(("code", "fragment"), GOLDEN)
-def test_lookup_prints_real_text_and_exits_zero(
-    prefix: list[str], code: str, fragment: str
-) -> None:
-    result = _run(prefix, code)
     assert result.returncode == 0, result.stderr
-    assert fragment in result.stdout
+    expected = f"7 (error, general LabVIEW): {_FILE_NOT_FOUND}\n"
+    assert result.stdout == expected
+    assert result.stdout == run_cli("7").stdout
 
 
-@pytest.mark.parametrize("prefix", PREFIXES, ids=IDS)
-def test_json_output_is_valid_and_round_trips(prefix: list[str]) -> None:
-    result = _run(prefix, "0xBFFF0015", "--json")
+def test_json_output_carries_every_field() -> None:
+    result = run_cli("0xBFFF0015", "--json")
     assert result.returncode == 0, result.stderr
-    payload = json.loads(result.stdout)
-    assert payload["code"] == -1073807339
-    assert payload["message"] == "Timeout expired before operation completed."
-    assert payload["family"] == "VISA"
-    assert payload["is_error"] is True
+    assert json.loads(result.stdout) == {
+        "code": -1073807339,
+        "message": "The operation did not finish before the timeout elapsed.",
+        "family": "VISA",
+        "is_error": True,
+        "is_warning": False,
+    }
 
 
-@pytest.mark.parametrize("prefix", PREFIXES, ids=IDS)
-def test_search_finds_the_visa_timeout(prefix: list[str]) -> None:
-    result = _run(prefix, "--search", "timeout", "--json")
+def test_search_finds_the_visa_timeout() -> None:
+    result = run_cli("--search", "before the timeout", "--json")
     assert result.returncode == 0, result.stderr
-    payload = json.loads(result.stdout)
-    assert any(rec["code"] == -1073807339 for rec in payload)
+    assert [rec["code"] for rec in json.loads(result.stdout)] == [-1073807339]
 
 
-@pytest.mark.parametrize("prefix", PREFIXES, ids=IDS)
-def test_family_listing_contains_a_known_dde_code(prefix: list[str]) -> None:
-    result = _run(prefix, "--family", "DDE")
+def test_family_listing_contains_a_known_dde_code() -> None:
+    result = run_cli("--family", "DDE")
     assert result.returncode == 0, result.stderr
-    assert "14001" in result.stdout
-    assert "Invalid refnum." in result.stdout
+    assert result.stdout.splitlines()[0] == "14001 (error, DDE): The refnum is not valid."
+    assert len(result.stdout.splitlines()) == len(lverror.in_family("DDE"))
 
 
-@pytest.mark.parametrize("prefix", PREFIXES, ids=IDS)
-def test_unknown_code_exits_one(prefix: list[str]) -> None:
-    result = _run(prefix, "123456789")
+def test_list_families_prints_one_name_per_line() -> None:
+    result = run_cli("--list-families")
+    assert result.returncode == 0, result.stderr
+    assert tuple(result.stdout.splitlines()) == lverror.families()
+
+
+def test_unknown_code_exits_one() -> None:
+    result = run_cli("123456789")
     assert result.returncode == 1
-    assert "no documented information" in result.stdout
+    assert result.stdout == "123456789 (warning, unknown family): no documented information\n"
 
 
-@pytest.mark.parametrize("prefix", PREFIXES, ids=IDS)
-def test_bad_input_exits_two_with_a_message(prefix: list[str]) -> None:
-    result = _run(prefix, "0xZZ")
+def test_bad_input_exits_two_with_a_message() -> None:
+    result = run_cli("0xZZ")
     assert result.returncode == 2
-    assert "not a valid code" in result.stderr
+    assert result.stdout == ""
+    assert result.stderr == "lverror: not a valid code: '0xZZ'\n"
 
 
-@pytest.mark.parametrize("prefix", PREFIXES, ids=IDS)
-def test_version_matches_the_package(prefix: list[str]) -> None:
-    result = _run(prefix, "--version")
+def test_two_actions_in_one_run_exit_two() -> None:
+    result = run_cli("7", "--search", "file")
+    assert result.returncode == 2
+    assert "not allowed with" in result.stderr
+
+
+def test_version_matches_the_package() -> None:
+    result = run_cli("--version")
     assert result.returncode == 0, result.stderr
-    assert "0.3.0" in result.stdout
+    assert result.stdout == f"lverror {lverror.__version__}\n"
 
 
-@pytest.mark.parametrize("prefix", PREFIXES, ids=IDS)
-def test_help_lists_runnable_examples(prefix: list[str]) -> None:
-    result = _run(prefix, "--help")
+def test_help_lists_runnable_examples() -> None:
+    result = run_cli("--help")
     assert result.returncode == 0, result.stderr
     assert "Examples:" in result.stdout
     assert "lverror --search" in result.stdout
+
+
+def test_search_without_a_match_exits_one_and_prints_nothing() -> None:
+    result = run_cli("--search", "no such words anywhere")
+    assert (result.returncode, result.stdout, result.stderr) == (1, "", "")
+
+
+def test_undocumented_code_in_a_known_family_exits_zero() -> None:
+    result = run_cli("-200300")
+    assert result.returncode == 0, result.stderr
+    assert result.stdout == (
+        "-200300 (error, NI-DAQmx): no documented message, classified by range only\n"
+    )
+
+
+def test_unknown_family_exits_two() -> None:
+    result = run_cli("--family", "GPIB")
+    assert result.returncode == 2
+    assert result.stderr.startswith("lverror: unknown family 'GPIB'; known families are: VISA")
+
+
+@pytest.mark.parametrize("args", [["--search", "a"], ["--family", "VISA", "--json"]])
+def test_a_reader_that_stops_early_gets_no_traceback(args: list[str]) -> None:
+    env = dict(os.environ)
+    package_parent = str(Path(lverror.__file__).resolve().parent.parent)
+    env["PYTHONPATH"] = package_parent + os.pathsep + env.get("PYTHONPATH", "")
+    with subprocess.Popen(
+        [*cli_command(), *args],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=env,
+    ) as proc:
+        assert proc.stdout is not None and proc.stderr is not None
+        assert proc.stdout.readline()
+        proc.stdout.close()
+        err = proc.stderr.read().decode("utf-8", "replace")
+        code = proc.wait(timeout=60)
+    assert "Traceback" not in err, err
+    assert code in (0, 1)

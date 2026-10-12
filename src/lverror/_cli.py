@@ -1,13 +1,17 @@
 """The ``lverror`` command-line tool: look up a code, search, or list a family, offline.
 
-Exit codes: ``0`` when the lookup or search yields information, ``1`` when a code or a search
-has no result, and ``2`` on bad input. Pass ``--json`` for machine-readable output.
+Exit codes: ``0`` when the lookup, search or family listing yields information, ``1`` when a
+code, a search or a known family has no result, and ``2`` on bad input, including an unknown
+family name and two actions in one run. Pass ``--json`` for
+machine-readable output.
 """
 
 from __future__ import annotations
 
 import argparse
+import errno
 import json
+import os
 import sys
 from collections.abc import Sequence
 
@@ -24,6 +28,7 @@ Examples:
   lverror --family VISA     list every documented code in a family
   lverror --list-families   show the known family names
   lverror 7 --json          machine-readable output
+  lverror -- -0x10          a negative hex code goes after --
 """
 
 
@@ -34,10 +39,12 @@ def _build_parser() -> argparse.ArgumentParser:
         epilog=_EXAMPLES,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("code", nargs="?", help="a code in decimal (7) or hex (0xBFFF0015)")
-    parser.add_argument("--search", metavar="TEXT", help="list codes whose message contains TEXT")
-    parser.add_argument("--family", metavar="NAME", help="list documented codes in a family")
-    parser.add_argument(
+    # One action per run: a code, a search, a family or the family list.
+    action = parser.add_mutually_exclusive_group()
+    action.add_argument("code", nargs="?", help="a code in decimal (7) or hex (0xBFFF0015)")
+    action.add_argument("--search", metavar="TEXT", help="list codes whose message contains TEXT")
+    action.add_argument("--family", metavar="NAME", help="list documented codes in a family")
+    action.add_argument(
         "--list-families", action="store_true", help="list the known family names and exit"
     )
     parser.add_argument("--json", action="store_true", help="emit JSON instead of text")
@@ -95,24 +102,39 @@ def _run_code(raw: str, as_json: bool) -> int:
     return 0 if (info.message is not None or info.family is not None) else 1
 
 
+def _dispatch(args: argparse.Namespace) -> int | None:
+    if args.list_families:
+        return _run_list_families(args.json)
+    if args.search is not None:
+        return _run_search(args.search, args.json)
+    if args.family is not None:
+        return _run_family(args.family, args.json)
+    if args.code is not None:
+        return _run_code(args.code, args.json)
+    return None
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """Run the command-line tool. Returns the process exit code."""
     parser = _build_parser()
     args = parser.parse_args(argv)
     try:
-        if args.list_families:
-            return _run_list_families(args.json)
-        if args.search is not None:
-            return _run_search(args.search, args.json)
-        if args.family is not None:
-            return _run_family(args.family, args.json)
-        if args.code is not None:
-            return _run_code(args.code, args.json)
+        status = _dispatch(args)
+        sys.stdout.flush()
     except ValueError as exc:
         print(f"lverror: {exc}", file=sys.stderr)
         return 2
-    parser.print_help(sys.stderr)
-    return 2
+    except OSError as exc:
+        # A reader that stops early (``lverror --search a | head -1``) closes the pipe; Windows
+        # reports that as EINVAL. Exit quietly instead of printing a traceback.
+        if exc.errno not in (errno.EPIPE, errno.EINVAL):
+            raise
+        os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())
+        return 1
+    if status is None:
+        parser.print_help(sys.stderr)
+        return 2
+    return status
 
 
 if __name__ == "__main__":

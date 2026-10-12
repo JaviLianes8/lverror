@@ -10,3 +10,9 @@ dist/
 .ruff_cache/
 .coverage
 htmlcov/
+
+# NI and LabVIEW Wiki texts captured for the tests: kept on the maintainer's machine only.
+# Re-create them with scripts/capture_sources.py (see CONTRIBUTING.md).
+tests/fixtures/sources/*
+!tests/fixtures/sources/MANIFEST.json
+!tests/fixtures/sources/labview-positive-codes.txt
