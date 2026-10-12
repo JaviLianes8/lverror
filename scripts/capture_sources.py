@@ -67,8 +67,8 @@ def _installed(codes: set[int], manifest: list[dict[str, object]]) -> None:
         data = path.read_bytes()
         blocks = [m.group(0) for m in ENTRY.finditer(data) if int(m.group(1)) in codes]
         body = b"<nidocument>\n" + b"\n".join(blocks) + b"\n</nidocument>\n"
-        (OUT / f"{source_id}.xml").write_bytes(body)
-        note = "excerpt: the <nierror> entries of the shipped codes, copied byte for byte"
+        (OUT / f"{source_id}.xml").write_bytes(body.replace(b"\r\n", b"\n"))
+        note = "excerpt: the <nierror> entries of the shipped codes, verbatim with LF line ends"
         manifest.append(_record(source_id, str(path), data, note))
 
 
@@ -105,13 +105,21 @@ def _manual(manifest: list[dict[str, object]]) -> None:
         text = subprocess.run(
             ["pdftotext", "-layout", str(pdf), "-"], capture_output=True, check=True
         ).stdout.decode("latin-1")
-    start = text.index("Table 5. Instrument Driver Error Codes")
-    end = text.index("Instrument-specific error", start) + len("Instrument-specific error")
-    # pdftotext writes the minus signs of this PDF as soft hyphens.
-    excerpt = text[start:end].replace("\xad", "-").replace("\r", "")
-    (OUT / "instrument-driver-1997.txt").write_text(excerpt + "\n", encoding="utf-8")
-    note = "excerpt: Table 5 as extracted by pdftotext -layout (part number 321551A-01)"
-    manifest.append(_record("instrument-driver-1997", MANUAL_URL, data, note))
+    parts = {
+        "instrument-driver-1997": (
+            "Table 5. Instrument Driver Error Codes",
+            "Instrument-specific error",
+        ),
+        "ranges-1997": ("Error Code Range", "DDE Error Codes"),
+    }
+    for source_id, (first, last) in parts.items():
+        start = text.index(first)
+        end = text.index(last, start) + len(last)
+        # pdftotext writes the minus signs of this PDF as soft hyphens.
+        excerpt = text[start:end].replace("\xad", "-").replace("\r", "")
+        (OUT / f"{source_id}.txt").write_text(excerpt + "\n", encoding="utf-8", newline="\n")
+        note = f"excerpt: from {first!r} to {last!r}, as extracted by pdftotext -layout"
+        manifest.append(_record(source_id, MANUAL_URL, data, note))
 
 
 def _ranges(manifest: list[dict[str, object]]) -> None:
@@ -120,7 +128,7 @@ def _ranges(manifest: list[dict[str, object]]) -> None:
     text = " ".join(re.sub(r"<[^>]+>", " ", page).split())
     start = text.index("You can define custom error codes")
     end = text.index("already established.", start) + len("already established.")
-    (OUT / "ni-ranges.txt").write_text(text[start:end] + "\n", encoding="utf-8")
+    (OUT / "ni-ranges.txt").write_text(text[start:end] + "\n", encoding="utf-8", newline="\n")
     note = "excerpt: the custom-range and shared-code sentences of the page text"
     manifest.append(_record("ni-ranges", RANGES_URL, data, note))
 
@@ -136,7 +144,7 @@ def main() -> int:
     _manual(manifest)
     _ranges(manifest)
     text = json.dumps({"sources": manifest}, indent=2) + "\n"
-    (OUT / "MANIFEST.json").write_text(text, encoding="utf-8")
+    (OUT / "MANIFEST.json").write_text(text, encoding="utf-8", newline="\n")
     print(f"captured {len(manifest)} sources for {len(codes)} codes", file=sys.stderr)
     return 0
 

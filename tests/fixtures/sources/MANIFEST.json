@@ -6,7 +6,7 @@
       "bytes": 359814,
       "sha256": "499924af568df32dee2038aaa87d7ab8fbb30e394d0dae4edc9f90ce2a781fb2",
       "retrieved": "2026-10-12",
-      "note": "excerpt: the <nierror> entries of the shipped codes, copied byte for byte"
+      "note": "excerpt: the <nierror> entries of the shipped codes, verbatim with LF line ends"
     },
     {
       "id": "visa-errors",
@@ -14,7 +14,7 @@
       "bytes": 15688,
       "sha256": "e1859360f23cce548620eb81aedcc53a5aab5c0674b4b03494758e233b404cd9",
       "retrieved": "2026-10-12",
-      "note": "excerpt: the <nierror> entries of the shipped codes, copied byte for byte"
+      "note": "excerpt: the <nierror> entries of the shipped codes, verbatim with LF line ends"
     },
     {
       "id": "nipal-errors",
@@ -22,7 +22,7 @@
       "bytes": 27104,
       "sha256": "dfcee41eecfb7a9ca146a4535c9314c66df629867d525f757809223c80b7ebb1",
       "retrieved": "2026-10-12",
-      "note": "excerpt: the <nierror> entries of the shipped codes, copied byte for byte"
+      "note": "excerpt: the <nierror> entries of the shipped codes, verbatim with LF line ends"
     },
     {
       "id": "daqmx-wiki",
@@ -46,13 +46,21 @@
       "bytes": 1533783,
       "sha256": "248defdd6122cc813be6e3480972adc081c88db4a6080a50b57ec84a0447cd7a",
       "retrieved": "2026-10-12",
-      "note": "excerpt: Table 5 as extracted by pdftotext -layout (part number 321551A-01)"
+      "note": "excerpt: from 'Table 5. Instrument Driver Error Codes' to 'Instrument-specific error', as extracted by pdftotext -layout"
+    },
+    {
+      "id": "ranges-1997",
+      "origin": "https://www.apexwaves.com/pdf/manuals/SC-2040/archived--labview-error-codes.pdf",
+      "bytes": 1533783,
+      "sha256": "248defdd6122cc813be6e3480972adc081c88db4a6080a50b57ec84a0447cd7a",
+      "retrieved": "2026-10-12",
+      "note": "excerpt: from 'Error Code Range' to 'DDE Error Codes', as extracted by pdftotext -layout"
     },
     {
       "id": "ni-ranges",
       "origin": "https://www.ni.com/docs/en-US/bundle/labview-api-ref/page/errors/ranges-of-labview-error-codes.html",
       "bytes": 213000,
-      "sha256": "3189c14120415089f15d15678db5661fc65245d2613433a87e77e2aa462b437f",
+      "sha256": "dce021c522f2b383161081aac094fe36849a077f05fee9f660be9b4814be8662",
       "retrieved": "2026-10-12",
       "note": "excerpt: the custom-range and shared-code sentences of the page text"
     }

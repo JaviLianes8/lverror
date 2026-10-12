@@ -47,10 +47,10 @@ POSITIVE_ERROR_CODES: frozenset[int] = frozenset(c for c in MESSAGES if c > 0) -
 #   network ("TCP/IP and UDP", 53 to 66) and DDE: the range table of NI's 1997 "LabVIEW Error
 #   Codes" manual.
 # - Derived, not quoted: VISA is every code whose high 16 bits are 0xBFFF (errors) or 0x3FFF
-#   (completions), which holds for every code in the installed NI-VISA error file; NI-DAQmx
-#   spans the -239999 to -200003 and 200003 to 223802 codes of the LabVIEW Wiki NI-DAQmx
-#   family table; general LabVIEW spans the positive LabVIEW 2026 codes up to its SMTP block
-#   ending at 16554.
+#   (completions), which holds for every code in the installed NI-VISA error file (VISA's
+#   success code 0 aside); NI-DAQmx covers the NI-DAQmx row of the LabVIEW Wiki family range
+#   table, which runs from -239999 to 215501; general LabVIEW covers the positive codes of the
+#   LabVIEW row of that table up to its SMTP block ending at 16554.
 RANGES: tuple[tuple[int, int, str], ...] = (
     (-1073807360, -1073741825, "VISA"),
     (-239999, -200000, "NI-DAQmx"),
