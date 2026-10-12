@@ -27,7 +27,7 @@ def _load(raw: str) -> tuple[dict[int, str], frozenset[int], frozenset[int]]:
     return messages, frozenset(visa), frozenset(data.get("positive_errors", ()))
 
 
-# code -> NI's description, from the sources named above.
+# code -> the library's description of the code (see the module docstring).
 MESSAGES: dict[int, str]
 _VISA_CODES: frozenset[int]
 _LISTED_ERRORS: frozenset[int]

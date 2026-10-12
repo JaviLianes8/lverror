@@ -15,14 +15,16 @@ any release.
 
 ### Changed
 
-- Every description is rewritten for this library, matching the meaning of NI's error
-  descriptions without reusing NI's wording. 0.3.0 mixed text close to NI's with shortened or
+- The descriptions are written for this library, matching the meaning of NI's error
+  descriptions without reusing NI's wording: 878 of the 888 are rewritten, and the other 10
+  were already in the library's own words. 0.3.0 mixed text close to NI's with shortened or
   reworded messages, some of which no longer matched NI's current meaning (VISA -1073807239,
   for example, now describes the secure-connection error the installed NI-VISA file names).
   Each description was checked against NI's sources (the error files LabVIEW 2026, NI-VISA and
   NI-PAL install, the LabVIEW Wiki NI-DAQmx page and NI's 1997 instrument driver table), which
   the tests keep as references; they are not distributed. The set of 888 codes is unchanged.
-- Codes NI documents with two meanings give both, joined by `Also:` (2 and 61 to 65).
+- Code 2 now gives both of the meanings NI documents for it, joined by `Also:`, as 61 to 65
+  already did.
 - `is_error` reports every positive code NI's LabVIEW 2026 error file lists as an error
   (unless NI's text calls it a warning) even when its text is not shipped; 0.3.0 reported 369
   of them, such as 1612, as warnings. The list ships as code numbers only.

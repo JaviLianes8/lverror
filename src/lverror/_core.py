@@ -40,7 +40,7 @@ def _family_of(code: int) -> str | None:
 
 
 def explain(code: SupportsIndex) -> str | None:
-    """Return NI's description of a code, or ``None`` if no captured source documents it.
+    """Return the library's description of a code, or ``None`` if no NI source documents it.
 
     Raises ``TypeError`` if ``code`` is not an integer (``bool`` included) and ``ValueError``
     if it is outside the signed 32-bit range every LabVIEW error code fits in.
@@ -54,7 +54,7 @@ def explain(code: SupportsIndex) -> str | None:
 
 
 def is_known(code: SupportsIndex) -> bool:
-    """Report whether the package ships NI's message for the code.
+    """Report whether the package ships a description for the code.
 
     >>> is_known(7), is_known(-200300)
     (True, False)

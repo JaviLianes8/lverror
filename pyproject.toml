@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "lverror"
 version = "1.0.0"
-description = "Offline lookup that turns a LabVIEW or NI error code into NI's own description, with no LabVIEW installed"
+description = "Offline lookup that turns a LabVIEW or NI error code into a plain-English description, with no LabVIEW installed"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
