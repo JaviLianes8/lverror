@@ -123,7 +123,7 @@ def main() -> int:
             _words(text) == _words(str(theirs))
             or _shared_run(_words(text), _words(str(theirs))) >= 6
             or difflib.SequenceMatcher(
-                None, " ".join(_words(text)), " ".join(_words(str(theirs)))
+                None, " ".join(_words(text)), " ".join(_words(str(theirs))), autojunk=False
             ).ratio()
             >= 0.75
         ):

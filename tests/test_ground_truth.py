@@ -108,7 +108,9 @@ def test_every_shipped_code_is_documented_by_a_captured_source() -> None:
 
 
 def _similarity(ours: str, theirs: str) -> float:
-    return difflib.SequenceMatcher(None, " ".join(_words(ours)), " ".join(_words(theirs))).ratio()
+    # autojunk would ignore common characters in texts of 200 characters or more.
+    joined = " ".join(_words(ours)), " ".join(_words(theirs))
+    return difflib.SequenceMatcher(None, *joined, autojunk=False).ratio()
 
 
 def test_no_message_repeats_the_wording_of_its_source() -> None:
@@ -143,6 +145,9 @@ def test_the_overlap_check_bites() -> None:
     assert _words("timeout EXPIRED, before operation completed") == theirs
     assert _shared_run(_words("a b c d e f g"), _words("x b c d e f g y")) == 6
     assert _similarity("The pen does not exist.", "Pen does not exist.") >= 0.75
+    theirs_long = " ".join(f"word{i} and" for i in range(60))
+    ours_long = theirs_long.replace("word7 ", "term7 ").replace("word31 ", "term31 ")
+    assert len(theirs_long) > 200 and _similarity(ours_long, theirs_long) >= 0.75
 
 
 def test_every_entry_is_tagged_with_the_source_that_documents_it() -> None:
