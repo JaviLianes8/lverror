@@ -765,7 +765,7 @@
 [1524, "labview-errors", "The target version given for saving has an invalid format."],
 [1525, "labview-errors", "Reading this control's value is impossible while its defining class is unavailable. Loading the missing LabVIEW class file makes the data readable."],
 [1526, "labview-errors", "When a graph or chart shows its plot legend in tree view, this property is not applicable."],
-[1527, "labview-errors", "Flattened data was read for a class that LabVIEW does not have in memory at the moment."],
+[1527, "labview-errors", "LabVIEW tried to read flattened data for a class it does not currently have in memory."],
 [1528, "labview-errors", "No scene object exists with the given name."],
 [1529, "labview-errors", "VI calls are nested too deeply. This usually happens when a recursion has no correct condition to end it."],
 [1530, "labview-errors", "A running VI tried to call a top-level VI as a subVI, which LabVIEW forbids."],
