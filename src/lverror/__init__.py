@@ -2,7 +2,7 @@
 
 Turn a numeric LabVIEW or NI error code into NI's own description without LabVIEW or any NI
 driver installed. The text ships inside the package, copied word for word from the error
-files LabVIEW 2026 and NI-VISA install, the LabVIEW Wiki NI-DAQmx page and NI's 1997
+files LabVIEW 2026, NI-VISA and NI-PAL install, the LabVIEW Wiki NI-DAQmx page and NI's 1997
 instrument driver table. Every other code is still classified by the range, or family, it
 falls in. No description is written by hand.
 

@@ -25,12 +25,20 @@
       "note": "excerpt: the <nierror> entries of the shipped codes, verbatim with LF line ends"
     },
     {
+      "id": "labview-positive-codes",
+      "origin": "C:\\Program Files\\National Instruments\\LabVIEW 2026\\resource\\errors\\English\\LabVIEW-errors.txt",
+      "bytes": 359814,
+      "sha256": "499924af568df32dee2038aaa87d7ab8fbb30e394d0dae4edc9f90ce2a781fb2",
+      "retrieved": "2026-10-12",
+      "note": "derived: every positive code of the LabVIEW file, marked warning when its text contains the word warning, otherwise error"
+    },
+    {
       "id": "daqmx-wiki",
       "origin": "https://labviewwiki.org/w/index.php?title=NI-DAQmx_Error_Code_Family&action=raw",
       "bytes": 1102348,
       "sha256": "37d0e1de8a7408aa5c9357aea2dc81c654834a13da4c98f1ca259c5828acd59b",
       "retrieved": "2026-10-12",
-      "note": "excerpt: the wikitext rows of the shipped NI-DAQmx codes, copied verbatim"
+      "note": "excerpt: the wikitext rows of the shipped NI-DAQmx codes, verbatim, joined by |- and closed with an added |}"
     },
     {
       "id": "wiki-families",
@@ -46,7 +54,7 @@
       "bytes": 1533783,
       "sha256": "248defdd6122cc813be6e3480972adc081c88db4a6080a50b57ec84a0447cd7a",
       "retrieved": "2026-10-12",
-      "note": "excerpt: from 'Table 5. Instrument Driver Error Codes' to 'Instrument-specific error', as extracted by pdftotext -layout"
+      "note": "excerpt: from 'Table 5. Instrument Driver Error Codes' to 'Instrument-specific error', as extracted by pdftotext -layout, with its soft-hyphen minus signs written as ASCII hyphen-minus"
     },
     {
       "id": "ranges-1997",
@@ -54,13 +62,13 @@
       "bytes": 1533783,
       "sha256": "248defdd6122cc813be6e3480972adc081c88db4a6080a50b57ec84a0447cd7a",
       "retrieved": "2026-10-12",
-      "note": "excerpt: from 'Error Code Range' to 'DDE Error Codes', as extracted by pdftotext -layout"
+      "note": "excerpt: from 'Error Code Range' to 'DDE Error Codes', as extracted by pdftotext -layout, with its soft-hyphen minus signs written as ASCII hyphen-minus"
     },
     {
       "id": "ni-ranges",
       "origin": "https://www.ni.com/docs/en-US/bundle/labview-api-ref/page/errors/ranges-of-labview-error-codes.html",
       "bytes": 213000,
-      "sha256": "dce021c522f2b383161081aac094fe36849a077f05fee9f660be9b4814be8662",
+      "sha256": "18262ad0631adb112dbe065530ffd2def0ba63f0611cf1b7d7e290987112c0e3",
       "retrieved": "2026-10-12",
       "note": "excerpt: the custom-range and shared-code sentences of the page text"
     }

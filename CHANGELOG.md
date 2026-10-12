@@ -16,12 +16,15 @@ NI changes it.
 ### Changed
 
 - Every message is now NI's own text, word for word. 0.3.0 shipped 888 messages of which
-  only 224 matched NI exactly; the rest were shortened or reworded, and a few described a
-  different error (VISA -1073807239, for example). The text now comes from the error files
-  LabVIEW 2026 and NI-VISA install, the LabVIEW Wiki NI-DAQmx page and NI's 1997 instrument
+  only 224 matched NI exactly; the rest were shortened or reworded, some from older NI
+  wording (VISA -1073807239, for example, now reads as the installed NI-VISA file has it).
+  The text now comes from the error files LabVIEW 2026, NI-VISA and NI-PAL install, the LabVIEW Wiki NI-DAQmx page and NI's 1997 instrument
   driver table, captured with their origin and checksum in `tests/fixtures/sources`. The set
   of 888 codes is unchanged.
 - Codes NI lists twice keep both meanings, joined by `Also:` (2 and 61 to 65).
+- `is_error` reports every positive code NI's LabVIEW 2026 error file lists as an error
+  (unless NI's text calls it a warning) even when its text is not shipped; 0.3.0 reported 369
+  of them, such as 1612, as warnings. The list ships as code numbers only.
 - The VISA family now covers every VISA code (`0xBFFF0000` to `0xBFFFFFFF` and the
   completion codes `0x3FFF0000` to `0x3FFFFFFF`); 34 documented VISA codes, including all the
   completion codes, used to report no family.

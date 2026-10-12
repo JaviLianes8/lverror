@@ -59,7 +59,8 @@ the [changelog](https://github.com/JaviLianes8/lverror/blob/main/CHANGELOG.md).
 
 ## Where the text comes from
 
-Every message is NI's text, copied verbatim and checked by the test suite against captured
+Every message is NI's text, copied verbatim (the NI-DAQmx text through the LabVIEW Wiki,
+which reproduces it) and checked by the test suite against captured
 sources whose origin, size and SHA-256 are recorded in `tests/fixtures/sources/MANIFEST.json`:
 
 - 729 codes from the error file LabVIEW 2026 installs (`LabVIEW-errors.txt`), 99 VISA codes
@@ -71,7 +72,8 @@ sources whose origin, size and SHA-256 are recorded in `tests/fixtures/sources/M
 - 17 instrument driver codes that LabVIEW 2026 no longer lists, from Table 5 of NI's 1997
   "LabVIEW Error Codes" manual (part number 321551A-01).
 
-Only the `LabVIEW: (Hex 0x7)` style prefix and NI's bold tags are removed. Where NI lists one
+Only the `LabVIEW: (Hex 0x7)` style prefix and NI's bold tags are removed, and line breaks
+and runs of spaces become single spaces. Where NI lists one
 code twice with two meanings (serial and network codes 61 to 65, for example), both are kept,
 joined by `Also:`. A code outside these sources has no message: `explain` returns `None`,
 while `describe` still reports its family. The full NI code set runs to tens of thousands of
@@ -100,8 +102,9 @@ and data pipelines, and test-rig tooling that never has LabVIEW.
 
 LabVIEW's authoritative error flag is the `status` boolean of the error cluster, which a bare
 code does not carry. Offline, `is_error` and `is_warning` apply the usual convention: negative
-codes are errors, `0` is success and positive codes are warnings, except the documented
-positive codes of the legacy general, network and DDE families, which are errors.
+codes are errors, `0` is success and positive codes are warnings, except the positive codes
+NI's LabVIEW error file lists as errors (1026 of them, from the general, network and DDE
+families among others), which are errors even when their text is not shipped.
 
 ## License
 

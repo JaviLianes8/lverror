@@ -81,5 +81,6 @@ def test_data_loader_refuses_a_duplicate_code() -> None:
 
 def test_data_loader_marks_only_positive_visa_codes_as_warnings() -> None:
     raw = '{"messages": [[1073676294, "visa-errors", "a"], [7, "labview-errors", "b"]]}'
-    messages, visa = _data._load(raw)
+    messages, visa, listed = _data._load(raw)
     assert messages == {1073676294: "a", 7: "b"} and visa == frozenset({1073676294})
+    assert listed == frozenset()

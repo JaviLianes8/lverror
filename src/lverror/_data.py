@@ -2,9 +2,10 @@
 
 Every message is NI's text for the code, word for word, read from ``_messages.json``. That file
 is built by ``scripts/build_messages.py`` from sources captured in ``tests/fixtures/sources``:
-the error files that LabVIEW 2026 and NI-VISA install, the LabVIEW Wiki NI-DAQmx error page,
-and NI's 1997 instrument driver table. No message is written by hand; a code absent from
-those sources carries no message and is classified only by the range it falls in.
+the error files that LabVIEW 2026, NI-VISA and NI-PAL install, the LabVIEW Wiki NI-DAQmx
+error page (which reproduces NI's DAQmx text), and NI's 1997 instrument driver table. No
+message is written by hand; a code absent from those sources carries no message and is
+classified only by the range it falls in.
 """
 
 from __future__ import annotations
@@ -13,32 +14,37 @@ import json
 from importlib import resources
 
 
-def _load(raw: str) -> tuple[dict[int, str], frozenset[int]]:
+def _load(raw: str) -> tuple[dict[int, str], frozenset[int], frozenset[int]]:
+    data = json.loads(raw)
     messages: dict[int, str] = {}
     visa: set[int] = set()
-    for code, source, text in json.loads(raw)["messages"]:
+    for code, source, text in data["messages"]:
         if code in messages:
             raise ValueError(f"duplicate error code in the data file: {code}")
         messages[code] = text
         if source == "visa-errors":
             visa.add(code)
-    return messages, frozenset(visa)
+    return messages, frozenset(visa), frozenset(data.get("positive_errors", ()))
 
 
 # code -> NI's description, from the sources named above.
 MESSAGES: dict[int, str]
 _VISA_CODES: frozenset[int]
-MESSAGES, _VISA_CODES = _load(
+_LISTED_ERRORS: frozenset[int]
+MESSAGES, _VISA_CODES, _LISTED_ERRORS = _load(
     resources.files(__package__).joinpath("_messages.json").read_text(encoding="utf-8")
 )
 
 # Positive codes that are warnings or completions, not errors (the VISA completion family).
 WARNING_CODES: frozenset[int] = frozenset(c for c in _VISA_CODES if c > 0)
 
-# Positive codes that denote errors, not warnings. LabVIEW's legacy general, network and DDE
-# families number some errors with positive values, against the usual "positive means warning"
-# convention; the VISA completion codes above are the positive values that are not errors.
-POSITIVE_ERROR_CODES: frozenset[int] = frozenset(c for c in MESSAGES if c > 0) - WARNING_CODES
+# Positive codes that denote errors, not warnings, against the usual "positive means warning"
+# convention: every shipped positive code except the VISA completions, plus every positive code
+# the LabVIEW 2026 error file lists whose text does not call it a warning (shipped as numbers
+# only, so is_error is right for them even when their text is not shipped).
+POSITIVE_ERROR_CODES: frozenset[int] = (
+    frozenset(c for c in MESSAGES if c > 0) - WARNING_CODES
+) | _LISTED_ERRORS
 
 # Numeric ranges, most specific first. Each tuple is (low, high, family); the first match wins,
 # so a code shared by two families (NI notes that 65 is both a serial and a network code)

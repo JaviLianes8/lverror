@@ -83,8 +83,9 @@ except ValueError as exc:
 
 A bare code does not carry LabVIEW's `status` flag, so `is_error` and `is_warning` apply the
 usual numeric convention: negative codes are errors, `0` is success, positive codes are
-warnings, except the documented positive codes of the legacy general, network and DDE
-families, which are errors. The VISA completion codes (`0x3FFF....`) are warnings. Exactly
+warnings, except the positive codes NI's LabVIEW 2026 error file lists, which are errors
+unless NI's text calls them a warning (only 40624 does). That list ships as numbers only, so
+1612 is an error although its text is not shipped. The VISA completion codes (`0x3FFF....`) are warnings. Exactly
 one of the two is true for every code except `0`.
 
 ```python
@@ -92,6 +93,7 @@ import lverror
 
 assert lverror.is_error(-1073807339) and not lverror.is_warning(-1073807339)
 assert lverror.is_error(7)  # a documented positive LabVIEW error
+assert lverror.is_error(1612) and lverror.explain(1612) is None  # listed by NI, text not shipped
 assert lverror.is_warning(1073676294)  # a VISA completion code
 assert lverror.is_warning(200010)  # positive and undocumented: a warning by convention
 assert not lverror.is_error(0) and not lverror.is_warning(0)
@@ -104,6 +106,8 @@ records of one family, matching the name case-insensitively, and raises `ValueEr
 unknown name. A code shared by two families reports the more specific one: the network
 range wins over general LabVIEW for 53 to 66. Three families (analysis VI, data acquisition
 VI and user-defined) classify codes but ship no messages, so `in_family` returns `[]` for them.
+Codes outside every range, such as the COM codes (`-2147467259`) or NI-PAL's `-50251`, have
+no family even when their message ships.
 
 ```python
 import lverror

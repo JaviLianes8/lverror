@@ -36,7 +36,7 @@ DESCRIPTIONS = {
 
 def _clean(text: str) -> str:
     # NI marks control and menu names in bold; the tags are presentation, not text.
-    text = text.replace("<b>", "").replace("</b>", "")
+    text = re.sub(r"</?[bB]>", "", text)
     for entity, char in ENTITIES.items():
         text = text.replace(entity, char)
     text = " ".join(text.split())
@@ -63,6 +63,14 @@ def _wiki() -> dict[int, list[str]]:
 def _manual() -> dict[int, list[str]]:
     pairs = json.loads((SOURCES / "instrument-driver-1997-pairs.json").read_text("utf-8"))
     return {int(code): [text] for code, text in pairs["pairs"]}
+
+
+def _positive_errors() -> list[int]:
+    # Positive codes NI's LabVIEW file lists as errors, shipped as numbers only, so that
+    # is_error is right for them even when their text is not shipped.
+    text = (SOURCES / "labview-positive-codes.txt").read_text(encoding="utf-8")
+    pairs = [line.split() for line in text.splitlines()]
+    return [int(code) for code, kind in pairs if kind == "error"]
 
 
 def _is_visa(code: int) -> bool:
@@ -94,7 +102,16 @@ def main() -> int:
     entries = build(codes)
     lines = [json.dumps(entry, ensure_ascii=False) for entry in entries]
     head = json.dumps(DESCRIPTIONS, indent=1, ensure_ascii=False)
-    body = '{\n"sources": ' + head + ',\n"messages": [\n' + ",\n".join(lines) + "\n]\n}\n"
+    errors = json.dumps(_positive_errors())
+    body = (
+        '{\n"sources": '
+        + head
+        + ',\n"positive_errors": '
+        + errors
+        + ',\n"messages": [\n'
+        + ",\n".join(lines)
+        + "\n]\n}\n"
+    )
     TARGET.write_text(body, encoding="utf-8", newline="\n")
     print(f"wrote {len(entries)} messages")
     return 0

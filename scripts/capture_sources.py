@@ -70,6 +70,25 @@ def _installed(codes: set[int], manifest: list[dict[str, object]]) -> None:
         (OUT / f"{source_id}.xml").write_bytes(body.replace(b"\r\n", b"\n"))
         note = "excerpt: the <nierror> entries of the shipped codes, verbatim with LF line ends"
         manifest.append(_record(source_id, str(path), data, note))
+    _positive_codes(INSTALLED["labview-errors"].read_bytes(), manifest)
+
+
+def _positive_codes(data: bytes, manifest: list[dict[str, object]]) -> None:
+    # Code numbers only, no text: which positive codes the LabVIEW file lists, and which of
+    # those NI's own text calls a warning.
+    lines = []
+    for match in ENTRY.finditer(data):
+        code = int(match.group(1))
+        if code > 0:
+            kind = "warning" if re.search(rb"\bwarning\b", match.group(0), re.I) else "error"
+            lines.append(f"{code} {kind}")
+    text = "\n".join(sorted(set(lines), key=lambda line: int(line.split()[0]))) + "\n"
+    (OUT / "labview-positive-codes.txt").write_text(text, encoding="utf-8", newline="\n")
+    note = (
+        "derived: every positive code of the LabVIEW file, marked warning when its text "
+        "contains the word warning, otherwise error"
+    )
+    manifest.append(_record("labview-positive-codes", str(INSTALLED["labview-errors"]), data, note))
 
 
 def _daqmx(codes: set[int], manifest: list[dict[str, object]]) -> None:
@@ -77,7 +96,10 @@ def _daqmx(codes: set[int], manifest: list[dict[str, object]]) -> None:
     rows = [m.group(0) for m in ROW.finditer(data.decode("utf-8")) if int(m.group(1)) in codes]
     table = "|-\n" + "|-\n".join(rows) + "|}\n"
     (OUT / "daqmx-wiki.txt").write_text(table, encoding="utf-8", newline="\n")
-    note = "excerpt: the wikitext rows of the shipped NI-DAQmx codes, copied verbatim"
+    note = (
+        "excerpt: the wikitext rows of the shipped NI-DAQmx codes, verbatim, joined by |- "
+        "and closed with an added |}"
+    )
     manifest.append(_record("daqmx-wiki", DAQMX_URL, data, note))
 
 
@@ -118,7 +140,10 @@ def _manual(manifest: list[dict[str, object]]) -> None:
         # pdftotext writes the minus signs of this PDF as soft hyphens.
         excerpt = text[start:end].replace("\xad", "-").replace("\r", "")
         (OUT / f"{source_id}.txt").write_text(excerpt + "\n", encoding="utf-8", newline="\n")
-        note = f"excerpt: from {first!r} to {last!r}, as extracted by pdftotext -layout"
+        note = (
+            f"excerpt: from {first!r} to {last!r}, as extracted by pdftotext -layout, "
+            "with its soft-hyphen minus signs written as ASCII hyphen-minus"
+        )
         manifest.append(_record(source_id, MANUAL_URL, data, note))
 
 
