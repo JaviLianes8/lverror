@@ -16,7 +16,7 @@ any release.
 ### Changed
 
 - The descriptions are written for this library, matching the meaning of NI's error
-  descriptions without reusing NI's wording: 878 of the 888 are rewritten, and the other 10
+  descriptions without reusing NI's wording: 885 of the 888 are rewritten, and the other 3
   were already in the library's own words. 0.3.0 mixed text close to NI's with shortened or
   reworded messages, some of which no longer matched NI's current meaning (VISA -1073807239,
   for example, now describes the secure-connection error the installed NI-VISA file names).
