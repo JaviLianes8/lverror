@@ -18,8 +18,8 @@ NI changes it.
 - Every message is now NI's own text, word for word. 0.3.0 shipped 888 messages of which
   only 224 matched NI exactly; the rest were shortened or reworded, some from older NI
   wording (VISA -1073807239, for example, now reads as the installed NI-VISA file has it).
-  The text now comes from the error files LabVIEW 2026, NI-VISA and NI-PAL install, the LabVIEW Wiki NI-DAQmx page and NI's 1997 instrument
-  driver table, captured with their origin and checksum in `tests/fixtures/sources`. The set
+  The text now comes from the error files LabVIEW 2026, NI-VISA and NI-PAL install, the
+  LabVIEW Wiki NI-DAQmx page and NI's 1997 instrument driver table, captured with their origin and checksum in `tests/fixtures/sources`. The set
   of 888 codes is unchanged.
 - Codes NI lists twice keep both meanings, joined by `Also:` (2 and 61 to 65).
 - `is_error` reports every positive code NI's LabVIEW 2026 error file lists as an error

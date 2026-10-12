@@ -85,8 +85,8 @@ A bare code does not carry LabVIEW's `status` flag, so `is_error` and `is_warnin
 usual numeric convention: negative codes are errors, `0` is success, positive codes are
 warnings, except the positive codes NI's LabVIEW 2026 error file lists, which are errors
 unless NI's text calls them a warning (only 40624 does). That list ships as numbers only, so
-1612 is an error although its text is not shipped. The VISA completion codes (`0x3FFF....`) are warnings. Exactly
-one of the two is true for every code except `0`.
+1612 is an error although its text is not shipped. The VISA completion codes (`0x3FFF....`)
+are warnings. Exactly one of the two is true for every code except `0`.
 
 ```python
 import lverror

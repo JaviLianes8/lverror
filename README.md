@@ -103,8 +103,9 @@ and data pipelines, and test-rig tooling that never has LabVIEW.
 LabVIEW's authoritative error flag is the `status` boolean of the error cluster, which a bare
 code does not carry. Offline, `is_error` and `is_warning` apply the usual convention: negative
 codes are errors, `0` is success and positive codes are warnings, except the positive codes
-NI's LabVIEW error file lists as errors (1026 of them, from the general, network and DDE
-families among others), which are errors even when their text is not shipped.
+NI's LabVIEW error file lists, unless NI's text calls them a warning (1026 of them, from the
+general, network and DDE families among others), which are errors even when their text is
+not shipped.
 
 ## License
 
