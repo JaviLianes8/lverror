@@ -10,9 +10,33 @@ Progress:
 - [x] Docs: README, GUIDE, CHANGELOG (items 11, 12)
 - [x] Packaging, e2e and upgrade from PyPI 0.3.0 (items 8, 10, 13, 14)
 - [x] Version bump to 1.0.0
-- [ ] Independent reviewer and five QA lenses report PASS (items 16, 19)
-- [ ] Gates (item 15)
+- [x] Independent reviewer and five QA lenses report PASS (items 16, 19)
+- [x] Gates (item 15)
 - [ ] PR and trace guard (item 17); merge and publish pending
+
+## Scorecard (author)
+
+| # | Item | Verdict | Evidence |
+| --- | --- | --- | --- |
+| 1 | API reviewed for stability | PASS | Same 18 names as 0.3.0; argument validation (`TypeError`/`ValueError`), `SupportsIndex` code parameters, plain-`int` `ErrorInfo.code`, exclusive CLI actions; every change in CHANGELOG 1.0.0 |
+| 2 | `__all__` exact | PASS | `test_contract::test_all_lists_exactly_the_public_api`; `test_docs::test_examples_import_only_public_names` |
+| 3 | Docstring with runnable example, doctests pass | PASS | `test_docs` (every module doctested, every name has `>>>` and appears in an example); README and GUIDE blocks and `$ lverror` transcripts executed |
+| 4 | Typed end to end | PASS | `mypy --strict src tests` exit 0; `py.typed` in the wheel; external strict consumer clean (lens a) |
+| 5 | Typed, documented, safe errors | PASS | `test_validation`, `test_round2_contracts`, `test_round4_contracts`: messages bounded for 10 MB strings and 100000-bit integers, failing reprs handled |
+| 6 | Contract asserts the full promise | PASS | 383 tests; a promise test per public name plus boundary contracts from five blind rounds |
+| 7 | Real ground truth | PASS | 888 of 888 messages equal NI's text in the error files LabVIEW 2026, NI-VISA and NI-PAL install on this PC (830), the LabVIEW Wiki DAQmx page (41) and NI's 1997 manual (17, hand-paired and labelled); excerpts with size, SHA-256 and date in `MANIFEST.json`; NI docs pages used as an independent oracle by lens b |
+| 8 | Real e2e incl. PyPI upgrade | PASS | Wheel in clean venvs, suite from the sdist with `src` removed, a sabotaged installed CLI fails 18 of 20 CLI tests (the other two only check for no traceback), PyPI 0.3.0 upgraded in place matches CHANGELOG (lens d, reviewer) |
+| 9 | Seeded fuzz, no crash, hang or blow-up | PASS | `test_fuzz.py` (seed 20261012) against brute-force references; lens c: 780000 random string calls, linear scaling to 10 million characters, 8-thread consistency |
+| 10 | Every interpreter on this PC | PASS | 3.10.19, 3.11.5, 3.12.12, 3.13.2, 3.14.2 green against the installed wheel (359 tests at 5af5bb2 by lens d, 372 at 0a4dfc8 by the reviewer) |
+| 11 | README | PASS | `twine check --strict` PASSED; absolute links tested; problem, why (PyPI facts checked by downloading the wheels), install, quick start, GUIDE and CHANGELOG links |
+| 12 | CHANGELOG dated 1.0.0 | PASS | `## [1.0.0] - 2026-10-12` with the stable surface and every behaviour change |
+| 13 | pyproject | PASS | 1.0.0, Production/Stable, 3.10 to 3.14, MIT, Homepage/Source/Issues/Changelog, keywords, `dependencies = []` (contract-tested) |
+| 14 | sdist and wheel contents | PASS | Wheel: modules, data file, `py.typed`, LICENSE, NOTICE; sdist adds tests, fixtures and the two data scripts; NOTICE covers the NI text and the CC BY 3.0 wiki data |
+| 15 | Gates exit 0 alone | PASS | `ruff format --check .` 0, `ruff check .` 0, `mypy --strict src` 0, `pytest` 0 (383 passed), each run alone |
+| 16 | Independent reviewer | PASS | items 1 to 18 PASS at 0a4dfc8, no failures |
+| 17 | PR, trace guard | ready | see the end of this report; merge and PyPI publish are left to the maintainer |
+| 18 | Mutation round | PASS | author round: 34 mutations, 4 survivors closed, 1 equivalent; blind lens (e): five rounds, 165 new mutations, every non-equivalent survivor closed |
+| 19 | Five QA lenses | PASS | a, b, c, d, e all PASS after their findings were fixed and re-verified |
 
 ## Baseline on 0.3.0 (before any change)
 
@@ -81,7 +105,8 @@ at once, 4 survived and were killed by new contracts on re-application, 1 equiva
 - `python -m build` and `twine check --strict`: both artifacts PASSED.
 - Wheel: the nine package modules, `_messages.json`, `py.typed`, LICENSE and metadata, nothing
   else. Sdist: `src`, `tests` with the source fixtures, the two data scripts, README, GUIDE,
-  CHANGELOG, LICENSE, pyproject, plus the `.gitignore` hatchling always adds.
+  CHANGELOG, LICENSE, pyproject, plus the `.gitignore` hatchling always adds. NOTICE was
+  added later, after lens d (it ships in both artifacts).
 - The wheel installed into a fresh venv on each of 3.10.19, 3.11.5, 3.12.12, 3.13.2 and
   3.14.2; the suite from the extracted sdist, with `src` removed so it imports the installed
   wheel and drives its console script, gave 315 passed on every one.
@@ -89,13 +114,65 @@ at once, 4 survived and were killed by new contracts on re-application, 1 equiva
   to NI's exact text, `family(1073676294)` from `None` to `VISA`, `explain(True)` from a
   message to `TypeError`, as CHANGELOG 1.0.0 lists.
 
-## QA lenses, first round (in progress)
+## Blind mutation rounds by QA lens (e) (items 18 and 19e)
 
-| Lens | First verdict | Findings | Status |
+Each round was designed from the source alone, without the author's table, applied one
+mutation at a time to the lens's own clone, and run against the full suite with `-x`. Every
+round first re-applied the previous round's survivors and confirmed them killed.
+
+| Round | State | Mutations | Killed | Equivalent or text only | Survived, then contract added | New contracts |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | c50e91d | 73 | 62 | 1 | 10 | `tests/test_boundaries.py` |
+| 2 | 18c77cb | 30 | 18 | 3 | 9 | `tests/test_round2_contracts.py` |
+| 3 | 60546d2 | 27 | 19 | 2 | 6 | `tests/test_round3_contracts.py` |
+| 4 | 0a4dfc8 | 21 | 11 | 3 | 7 | `tests/test_round4_contracts.py` |
+| 5 | 762acbf | 14 | 10 | 3 | 1 | `test_round4_contracts::test_usage_names_the_program_lverror` |
+| total | | 165 | 120 | 12 | 33, all closed | |
+
+Equivalent mutations, with the reason: the warning set built from every source except the
+LabVIEW file (no positive code comes from the other sources); the union with the listed
+errors taken before or after removing VISA completions (no listed code is a VISA completion);
+shipped positives dropped from the error set (all of them are listed); `codes()` in file order
+(the data file is sorted); a repeated code in `positive_errors` (read into a set); JSON
+written without ASCII escaping (all text is ASCII); two disjoint range rows swapped; NOTICE
+dropped from the sdist include list (hatchling ships license files anyway, and a contract pins
+the license-files entry); two text-only changes, later pinned anyway (the range message and
+the NOTICE sentence). Gaps the rounds closed: range edges on both sides of every family, entry
+source tags, the shipped error list against its fixture, `0X` prefixes and the 64-character
+cap, query stripping and limit checks on empty queries, CLI exit codes for no action, empty
+families, every pair of actions and the module form, JSON shapes, `nearest` at both ends,
+closed-pipe exit code and quiet stderr, runnable help examples, and short error forms.
+
+## Independent reviews (items 16 and 19)
+
+Every reviewer was a fresh agent that read the factory rules and CERT-1.0.md first, worked in
+its own clone, ran things rather than reading, and reported back privately. Lenses c and d and
+the first item 16 reviewer were cut by a usage limit and relaunched fresh.
+
+| Lens | First verdict | Findings | Final verdict |
 | --- | --- | --- | --- |
-| a. API and docs | FAIL (1 high, 1 medium, 4 low) | README said lvkit has no error table (it ships about 1300 messages); `--family` exit code 1 undocumented and three families ship no messages; `TABLE[...]` typed `int` only; CHANGELOG incomplete against 0.3.0; `UnknownCodeError` message unbounded; search normalisation undocumented | fixed in 63d2fd6, re-verification pending |
-| b. Correctness and ground truth | FAIL (1 medium, 4 low, 2 info) | 888 of 888 messages verified against the installed NI files, the fetched wiki page and the 1997 PDF; but 369 positive codes NI lists as errors were reported as warnings because their text is not shipped; provenance wording; manifest silent on two excerpt edits | fixed in e71d4db (positive codes NI lists ship as numbers only), re-verification pending |
-| c. Adversarial and robustness | cut by a usage limit | none reported | relaunched |
-| d. Packaging and real e2e | cut by a usage limit | none reported | relaunched |
-| e. Contract strength | FAIL (10 survivors of 73) | blind round: range edges, source tags, `0X`, 64-character cap, query stripping, limit check order, CLI with no action, empty family exit code | contracts added in 23bc805, second round pending |
-| Item 16 reviewer | cut by a usage limit | none reported | relaunched |
+| a. API and docs | FAIL (1 high, 1 medium, 4 low) | README said lvkit ships no error table (it has about 1300 messages); empty-family exit code undocumented; `TABLE[...]` typed `int` only; CHANGELOG incomplete against 0.3.0; unbounded `UnknownCodeError` message; search normalisation undocumented | PASS at 18c77cb: all fixed; examples, transcripts, strict consumer and `get_type_hints` on 3.10 and 3.14 re-run |
+| b. Correctness and ground truth | FAIL (1 medium, 4 low, 2 info) | 888 of 888 messages verified, but 369 positive codes NI lists were reported as warnings because their text is not shipped; provenance wording; manifest silent on two excerpt edits; case of bold tags | PASS at 18c77cb: the 1026-code error list equals its own derivation from the installed file, 0 mismatches in 43077 classification cases, 888 of 888 messages |
+| c. Adversarial and robustness | FAIL (2 medium, 3 low, 3 info) | traceback when the reader closes the pipe; deadline traceback lost under capture; long `UnknownCodeError` repr; lying `str` subclasses; negative-hex hint | PASS at d586272: closed pipes quiet in 12 runs, deadline traceback visible without `-s`, fuzz regression clean; accepted: a stdlib-named file in the current directory shadows imports (ordinary Python path behaviour), exceptions from a caller's own `__index__` propagate (documented) |
+| d. Packaging and real e2e | FAIL (1 medium, 1 low, 3 info) | no notice for the NI text and the CC BY 3.0 wiki data; unknown-family exit code wording | PASS at 5af5bb2: NOTICE in both artifacts, 359 passed from the sdist on 3.10 to 3.14 against the installed wheel, sdist install, 0.3.0 upgrade matches CHANGELOG |
+| e. Contract strength | FAIL (10 survivors) | five blind rounds, see above | PASS after the round 5 contract (973c075); the lens judged the surface exhausted |
+| Item 16 reviewer | PASS | items 1 to 18 PASS at 0a4dfc8 (17 pending), no failures | PASS |
+
+## Decisions for the maintainer
+
+- The messages are NI's text, verbatim, and the NI-DAQmx text comes through the LabVIEW Wiki
+  under CC BY 3.0. NOTICE says the NI text is not covered by the MIT license and attributes the
+  wiki. Shipping NI's wording is the premise of the package since 0.1.0; 1.0.0 makes it exact
+  and sourced.
+- The 888-code set is unchanged. The installed LabVIEW 2026 file holds 2523 codes and the wiki
+  8507 DAQmx codes; adding them is possible in a minor release but was kept out of the
+  certification to avoid shipping more third-party text without a decision.
+- `is_error` now trusts NI's LabVIEW file for every positive code it lists (1026 errors; only
+  40624 is a warning), shipped as numbers only. Positive codes outside that file, such as the
+  NI-PAL 50000 block and DAQmx positives, stay warnings by convention.
+- Ranges marked "derived" in `_data.py` and GUIDE (VISA, NI-DAQmx, general LabVIEW) are not
+  quoted from NI; they cover every code NI lists for those families. Negative LabVIEW codes
+  outside every range (COM codes, for example) have no family, documented as a limit.
+- Code arguments are now validated (`bool`, floats and strings raise `TypeError`, values
+  outside int32 raise `ValueError`); 0.3.0 silently looked up `True` as code 1.
+- The README links to GUIDE.md and NOTICE on `main`, so publish after the merge.
