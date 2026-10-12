@@ -64,7 +64,7 @@ def search(text: str, *, limit: SupportsIndex | None = None) -> list[ErrorInfo]:
     non-``str`` query or a non-integer ``limit`` raises ``TypeError``; a negative ``limit``
     raises ``ValueError``.
 
-    >>> [rec.code for rec in search("timeout expired")]
+    >>> [rec.code for rec in search("before the timeout")]
     [-1073807339]
     >>> len(search("visa", limit=2))
     2

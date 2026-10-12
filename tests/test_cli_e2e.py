@@ -1,8 +1,8 @@
 """Real end-to-end tests: run the ``lverror`` command of the package under test as a user does.
 
 Each test spawns a fresh process (the console script installed next to the test interpreter,
-or ``python -m lverror``) and checks the real stdout, stderr and exit code against NI text read
-straight from the captured LabVIEW 2026 and NI-VISA error files. No mocks, nothing installed.
+or ``python -m lverror``) and checks the real stdout, stderr and exit code against the shipped
+descriptions written out here in full. No mocks, nothing installed.
 """
 
 from __future__ import annotations
@@ -18,26 +18,26 @@ from _cli_command import cli_command, run_cli
 
 import lverror
 
-_SOURCES = Path(__file__).parent / "fixtures" / "sources"
-
-
-def _source_text(name: str, code: int) -> str:
-    raw = (_SOURCES / f"{name}.xml").read_text(encoding="utf-8")
-    body = raw.split(f'<nierror code="{code}">', 1)[1].split("</nierror>", 1)[0]
-    return " ".join(body.split()).split(") ", 1)[1]
-
+_FILE_NOT_FOUND = (
+    "The file could not be found. It may have been moved or removed. Check that the path is "
+    "right using a file explorer or the command prompt."
+)
+_TIMEOUT = "The operation did not finish before the timeout elapsed."
+_COMPLETION = (
+    "The transfer moved exactly the number of bytes requested. There may be more data waiting."
+)
 
 GOLDEN: list[tuple[str, int, str]] = [
-    ("7", 7, _source_text("labview-errors", 7)),
-    ("0xBFFF0015", -1073807339, _source_text("visa-errors", -1073807339)),
-    ("-1073807339", -1073807339, _source_text("visa-errors", -1073807339)),
-    ("14001", 14001, _source_text("labview-errors", 14001)),
-    ("1073676294", 1073676294, _source_text("visa-errors", 1073676294)),
+    ("7", 7, _FILE_NOT_FOUND),
+    ("0xBFFF0015", -1073807339, _TIMEOUT),
+    ("-1073807339", -1073807339, _TIMEOUT),
+    ("14001", 14001, "The refnum is not valid."),
+    ("1073676294", 1073676294, _COMPLETION),
 ]
 
 
 @pytest.mark.parametrize(("raw", "code", "text"), GOLDEN, ids=[g[0] for g in GOLDEN])
-def test_lookup_prints_ni_text_and_exits_zero(raw: str, code: int, text: str) -> None:
+def test_lookup_prints_the_description_and_exits_zero(raw: str, code: int, text: str) -> None:
     result = run_cli(raw)
     assert result.returncode == 0, result.stderr
     assert result.stdout.endswith(f": {text}\n")
@@ -52,7 +52,7 @@ def test_module_form_runs_the_same_tool() -> None:
         [sys.executable, "-m", "lverror", "7"], capture_output=True, text=True, env=env
     )
     assert result.returncode == 0, result.stderr
-    expected = f"7 (error, general LabVIEW): {_source_text('labview-errors', 7)}\n"
+    expected = f"7 (error, general LabVIEW): {_FILE_NOT_FOUND}\n"
     assert result.stdout == expected
     assert result.stdout == run_cli("7").stdout
 
@@ -62,7 +62,7 @@ def test_json_output_carries_every_field() -> None:
     assert result.returncode == 0, result.stderr
     assert json.loads(result.stdout) == {
         "code": -1073807339,
-        "message": "Timeout expired before operation completed.",
+        "message": "The operation did not finish before the timeout elapsed.",
         "family": "VISA",
         "is_error": True,
         "is_warning": False,
@@ -70,7 +70,7 @@ def test_json_output_carries_every_field() -> None:
 
 
 def test_search_finds_the_visa_timeout() -> None:
-    result = run_cli("--search", "timeout expired", "--json")
+    result = run_cli("--search", "before the timeout", "--json")
     assert result.returncode == 0, result.stderr
     assert [rec["code"] for rec in json.loads(result.stdout)] == [-1073807339]
 
@@ -78,7 +78,7 @@ def test_search_finds_the_visa_timeout() -> None:
 def test_family_listing_contains_a_known_dde_code() -> None:
     result = run_cli("--family", "DDE")
     assert result.returncode == 0, result.stderr
-    assert result.stdout.splitlines()[0] == "14001 (error, DDE): Invalid refnum."
+    assert result.stdout.splitlines()[0] == "14001 (error, DDE): The refnum is not valid."
     assert len(result.stdout.splitlines()) == len(lverror.in_family("DDE"))
 
 

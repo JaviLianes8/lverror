@@ -6,12 +6,16 @@ import json
 from importlib import resources
 from pathlib import Path
 
+import pytest
+
 import lverror
 
 _FIXTURE = Path(__file__).parent / "fixtures" / "sources" / "labview-positive-codes.txt"
 
 
 def _fixture_errors() -> set[int]:
+    if not _FIXTURE.is_file():
+        pytest.skip("the captured NI sources are not distributed")
     pairs = (line.split() for line in _FIXTURE.read_text(encoding="utf-8").splitlines())
     return {int(code) for code, kind in pairs if kind == "error"}
 
@@ -83,14 +87,11 @@ class _LyingStr(str):
 
 def test_str_subclasses_cannot_override_the_text_handling() -> None:
     assert lverror.parse_code(_LyingStr(" 7 ")) == 7
-    assert lverror.search(_LyingStr("timeout expired")) == lverror.search("timeout expired")
+    assert lverror.search(_LyingStr("before the timeout")) == lverror.search("before the timeout")
     assert lverror.in_family(_LyingStr(" dde ")) == lverror.in_family("DDE")
 
 
-def test_the_third_party_notice_ships_with_the_package() -> None:
-    root = Path(__file__).resolve().parent.parent
-    pyproject = (root / "pyproject.toml").read_text(encoding="utf-8")
-    assert 'license-files = ["LICENSE", "NOTICE"]' in pyproject
-    notice = (root / "NOTICE").read_text(encoding="utf-8")
-    assert "National Instruments" in notice
-    assert "https://creativecommons.org/licenses/by/3.0/" in notice
+def test_the_ni_sources_are_kept_out_of_the_distributions() -> None:
+    pyproject = (Path(__file__).resolve().parent.parent / "pyproject.toml").read_text("utf-8")
+    assert 'license-files = ["LICENSE"]' in pyproject
+    assert '"tests/fixtures/sources"]' in pyproject

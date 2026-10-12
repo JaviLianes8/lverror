@@ -1,11 +1,11 @@
-"""Baked-in LabVIEW and NI error data: NI's own message text and the documented code ranges.
+"""Baked-in LabVIEW and NI error data: the descriptions and the documented code ranges.
 
-Every message is NI's text for the code, word for word, read from ``_messages.json``. That file
-is built by ``scripts/build_messages.py`` from sources captured in ``tests/fixtures/sources``:
-the error files that LabVIEW 2026, NI-VISA and NI-PAL install, the LabVIEW Wiki NI-DAQmx
-error page (which reproduces NI's DAQmx text), and NI's 1997 instrument driver table. No
-message is written by hand; a code absent from those sources carries no message and is
-classified only by the range it falls in.
+The descriptions in ``_messages.json`` are written for this library and match the meaning of
+NI's error descriptions; they are not NI's text. Each entry names the NI source that documents
+its code (the error files LabVIEW 2026, NI-VISA and NI-PAL install, the LabVIEW Wiki NI-DAQmx
+page, or NI's 1997 instrument driver table); ``scripts/refresh_data.py`` checks them against the
+copies kept in ``tests/fixtures/sources``. A code absent from those sources carries no message
+and is classified only by the range it falls in.
 """
 
 from __future__ import annotations

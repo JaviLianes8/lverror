@@ -1,14 +1,13 @@
-"""Rebuild src/lverror/_messages.json from the captured NI sources in tests/fixtures/sources.
+"""Refresh src/lverror/_messages.json from the captured NI sources in tests/fixtures/sources.
 
-    python scripts/build_messages.py
+    python scripts/refresh_data.py
 
-Every message is NI's own text, taken from the first source that carries the code: the
-NI-VISA error file for VISA codes, then the LabVIEW 2026 error file, the NI-PAL error file,
-the LabVIEW Wiki NI-DAQmx page and the 1997 instrument driver table. Only the source prefix
-(such as ``LabVIEW: (Hex 0x7)``) and NI's ``<b>`` bold tags are removed, and runs of
-whitespace become one space. When a file lists one code twice, both texts are kept, joined
-by ``Also:``, as NI documents two meanings for it. The code set is the one already shipped;
-this script never adds a code.
+The messages themselves are written for this library and are kept as they are. For each code
+this script records which captured source documents it (the NI-VISA error file for VISA codes,
+then the LabVIEW 2026 error file, the NI-PAL error file, the LabVIEW Wiki NI-DAQmx page and the
+1997 instrument driver table), refuses a message that repeats the source's wording (the same
+words after normalisation, or six or more consecutive words in common), and rewrites the list
+of positive codes NI's LabVIEW file lists as errors. It never adds a code.
 """
 
 from __future__ import annotations
@@ -96,10 +95,34 @@ def build(codes: list[int]) -> list[list[object]]:
     return entries
 
 
+def _words(text: str) -> list[str]:
+    return re.sub(r"[^a-z0-9]+", " ", text.lower()).split()
+
+
+def _shared_run(ours: list[str], theirs: list[str]) -> int:
+    best, prev = 0, [0] * (len(theirs) + 1)
+    for word in ours:
+        cur = [0] * (len(theirs) + 1)
+        for j, other in enumerate(theirs, 1):
+            if word == other:
+                cur[j] = prev[j - 1] + 1
+                best = max(best, cur[j])
+        prev = cur
+    return best
+
+
 def main() -> int:
     current = json.loads(TARGET.read_text(encoding="utf-8"))
-    codes = sorted(int(entry[0]) for entry in current["messages"])
-    entries = build(codes)
+    ours = {int(entry[0]): str(entry[2]) for entry in current["messages"]}
+    entries: list[list[object]] = []
+    for code, source, theirs in build(sorted(ours)):
+        text = ours[code]
+        if (
+            _words(text) == _words(str(theirs))
+            or _shared_run(_words(text), _words(str(theirs))) >= 6
+        ):
+            raise ValueError(f"the message for {code} repeats the wording of {source}")
+        entries.append([code, source, text])
     lines = [json.dumps(entry, ensure_ascii=False) for entry in entries]
     head = json.dumps(DESCRIPTIONS, indent=1, ensure_ascii=False)
     errors = json.dumps(_positive_errors())
@@ -113,7 +136,7 @@ def main() -> int:
         + "\n]\n}\n"
     )
     TARGET.write_text(body, encoding="utf-8", newline="\n")
-    print(f"wrote {len(entries)} messages")
+    print(f"refreshed {len(entries)} messages")
     return 0
 
 

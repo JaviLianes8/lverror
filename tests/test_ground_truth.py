@@ -1,10 +1,12 @@
-"""Every shipped message is NI's own text, checked against the captured sources.
+"""Every shipped message matches a code NI documents, in this library's own words.
 
-The sources live in ``tests/fixtures/sources`` with their origin in ``MANIFEST.json``: excerpts
-of the error files LabVIEW 2026 and NI-VISA install (real program data), the LabVIEW Wiki
-NI-DAQmx page and NI's 1997 instrument driver table (fetched from the URLs recorded there).
-This parser is written independently of ``scripts/build_messages.py``: it locates each entry
-by the ``(Hex 0x...)`` tag computed from the code itself, so a wrong code would not match.
+The NI sources live in ``tests/fixtures/sources`` with their origin in ``MANIFEST.json``:
+excerpts of the error files LabVIEW 2026, NI-VISA and NI-PAL install (real program data), the
+LabVIEW Wiki NI-DAQmx page and NI's 1997 instrument driver table (fetched from the URLs recorded
+there). They are test-side references only and are not distributed. Each shipped code must be
+documented by one of them, and no shipped message may repeat the source's wording: not the same
+words after normalising case and punctuation, and no run of six or more consecutive words in
+common. The parser locates each entry by the ``(Hex 0x...)`` tag computed from the code itself.
 """
 
 from __future__ import annotations
@@ -19,6 +21,8 @@ import lverror
 from lverror._data import MESSAGES
 
 SOURCES = Path(__file__).parent / "fixtures" / "sources"
+if not SOURCES.is_dir():
+    pytest.skip("the captured NI sources are not distributed", allow_module_level=True)
 INSTALLED = {
     "labview-errors": Path(
         "C:/Program Files/National Instruments/LabVIEW 2026/resource/errors/English/"
@@ -80,25 +84,73 @@ def _expected() -> dict[int, str]:
     return expected
 
 
-def test_every_message_is_the_text_of_its_source() -> None:
+def _words(text: str) -> list[str]:
+    return re.sub(r"[^a-z0-9]+", " ", text.lower()).split()
+
+
+def _shared_run(ours: list[str], theirs: list[str]) -> int:
+    best, prev = 0, [0] * (len(theirs) + 1)
+    for word in ours:
+        cur = [0] * (len(theirs) + 1)
+        for j, other in enumerate(theirs, 1):
+            if word == other:
+                cur[j] = prev[j - 1] + 1
+                best = max(best, cur[j])
+        prev = cur
+    return best
+
+
+def test_every_shipped_code_is_documented_by_a_captured_source() -> None:
     expected = _expected()
-    wrong = [code for code, text in MESSAGES.items() if text != expected[code]]
-    assert wrong == []
+    assert sorted(expected) == sorted(MESSAGES)
     assert len(MESSAGES) == 888
 
 
-def test_spot_checks_read_straight_from_the_sources() -> None:
-    assert lverror.explain(7) == _entries("labview-errors")[7][0]
-    assert lverror.explain(-1073807339) == _entries("visa-errors")[-1073807339][0]
-    assert lverror.explain(-200279) == _wiki_rows()[-200279]
-    assert lverror.explain(-1240) == "Instrument timed out"
+def test_no_message_repeats_the_wording_of_its_source() -> None:
+    expected = _expected()
+    same = [c for c, text in MESSAGES.items() if _words(text) == _words(expected[c])]
+    assert same == []
+    long_runs = [
+        c for c, text in MESSAGES.items() if _shared_run(_words(text), _words(expected[c])) >= 6
+    ]
+    assert long_runs == []
+
+
+def test_the_overlap_check_bites() -> None:
+    theirs = _words("Timeout expired before operation completed.")
+    assert _words("timeout EXPIRED, before operation completed") == theirs
+    assert _shared_run(_words("a b c d e f g"), _words("x b c d e f g y")) == 6
+
+
+def test_every_entry_is_tagged_with_the_source_that_documents_it() -> None:
+    raw = (Path(lverror.__file__).parent / "_messages.json").read_text(encoding="utf-8")
+    visa, labview, nipal = (
+        _entries("visa-errors"),
+        _entries("labview-errors"),
+        _entries("nipal-errors"),
+    )
+    wiki, manual = _wiki_rows(), _manual_pairs()
+    for code, source, _text in json.loads(raw)["messages"]:
+        is_visa = (code & 0xFFFFFFFF) >> 16 in (0xBFFF, 0x3FFF)
+        found = next(
+            name
+            for name, table in (
+                ("visa-errors", visa if is_visa else {}),
+                ("labview-errors", labview),
+                ("nipal-errors", nipal),
+                ("daqmx-wiki", wiki),
+                ("instrument-driver-1997", manual),
+            )
+            if code in table
+        )
+        assert source == found, code
 
 
 def test_codes_listed_twice_keep_both_meanings() -> None:
     labview = _entries("labview-errors")
     for code in (2, 61, 62, 63, 64, 65):
         assert len(labview[code]) == 2
-        assert lverror.explain(code) == f"{labview[code][0]} Also: {labview[code][1]}"
+        assert " Also: " in (lverror.explain(code) or "")
 
 
 def test_the_manual_pairs_come_from_the_captured_table() -> None:

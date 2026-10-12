@@ -5,19 +5,20 @@ transcripts below are run by the test suite, so they stay correct.
 
 ## 1. Looking up one code
 
-`explain(code)` returns NI's text for a code, or `None` when the shipped sources do not
-document it. `describe(code)` returns an `ErrorInfo` with everything known.
+`explain(code)` returns the library's description of a code, or `None` when the shipped data
+does not document it. `describe(code)` returns an `ErrorInfo` with everything known. The
+descriptions are written for this library and match the meaning of NI's error descriptions.
 
 ```python
 import lverror
 
-assert lverror.explain(7).startswith("File not found.")
+assert lverror.explain(7).startswith("The file could not be found.")
 assert lverror.explain(-200300) is None
 
 info = lverror.describe(-1073807339)
 assert info == lverror.ErrorInfo(
     code=-1073807339,
-    message="Timeout expired before operation completed.",
+    message="The operation did not finish before the timeout elapsed.",
     family="VISA",
     is_error=True,
     is_warning=False,
@@ -37,14 +38,14 @@ assert lverror.family(-3) is None  # outside every known range
 ```
 
 Some codes mean different things in different LabVIEW subsystems. Where NI's file lists one
-code twice, both meanings are kept, joined by `Also:`:
+code twice, the description gives both meanings, joined by `Also:`:
 
 ```python
 import lverror
 
 assert lverror.explain(65) == (
-    "Serial port timeout; bytes not received at serial port. "
-    "Also: The network connection is already established."
+    "The serial port timed out because no bytes were received. "
+    "Also: The network connection has already been established."
 )
 ```
 
@@ -160,7 +161,7 @@ tuple of documented codes and `records()` yields their `ErrorInfo` in the same o
 ```python
 import lverror
 
-assert [rec.code for rec in lverror.search("TIMEOUT EXPIRED")] == [-1073807339]
+assert [rec.code for rec in lverror.search("BEFORE THE TIMEOUT")] == [-1073807339]
 assert len(lverror.search("timed out", limit=3)) == 3
 assert lverror.search("   ") == []
 assert len(lverror.codes()) == 888
@@ -180,7 +181,7 @@ from collections.abc import Mapping
 import lverror
 
 assert isinstance(lverror.TABLE, Mapping) and isinstance(lverror.TABLE, lverror.ErrorTable)
-assert lverror.TABLE[14001].message == "Invalid refnum."
+assert lverror.TABLE[14001].message == "The refnum is not valid."
 assert -200300 not in lverror.TABLE and lverror.TABLE.get(-200300) is None
 try:
     lverror.TABLE[-200300]
@@ -220,11 +221,11 @@ on bad input, including an unknown family name and two actions at once.
 
 ```
 $ lverror 14001
-14001 (error, DDE): Invalid refnum.
+14001 (error, DDE): The refnum is not valid.
 $ lverror 0x3FFF0006 --json
 {
   "code": 1073676294,
-  "message": "The number of bytes transferred is equal to the requested input count. More data might be available.",
+  "message": "The transfer moved exactly the number of bytes requested. There may be more data waiting.",
   "family": "VISA",
   "is_error": false,
   "is_warning": true

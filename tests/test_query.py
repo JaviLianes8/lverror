@@ -5,8 +5,8 @@ from lverror import _data
 
 
 def test_search_is_case_insensitive_and_matches_the_message() -> None:
-    lower = lverror.search("file not found")
-    upper = lverror.search("FILE NOT FOUND")
+    lower = lverror.search("file could not be found")
+    upper = lverror.search("FILE COULD NOT BE FOUND")
     assert lower == upper
     assert any(rec.code == 7 for rec in lower)
 

@@ -11,10 +11,14 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+import pytest
+
 import lverror
 from lverror._data import RANGES
 
 SOURCES = Path(__file__).parent / "fixtures" / "sources"
+if not SOURCES.is_dir():
+    pytest.skip("the captured NI sources are not distributed", allow_module_level=True)
 
 
 def _ranges_named(name: str) -> list[tuple[int, int]]:

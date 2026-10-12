@@ -15,6 +15,8 @@ import pytest
 import lverror
 
 SOURCES = Path(__file__).parent / "fixtures" / "sources"
+if not SOURCES.is_dir():
+    pytest.skip("the captured NI sources are not distributed", allow_module_level=True)
 LABVIEW = Path(
     "C:/Program Files/National Instruments/LabVIEW 2026/resource/errors/English/LabVIEW-errors.txt"
 )

@@ -1,7 +1,7 @@
 # lverror
 
-Offline lookup that turns a LabVIEW or NI error code into NI's own description, with no
-LabVIEW and no NI driver installed.
+Offline lookup that turns a LabVIEW or NI error code into a plain-English description, with
+no LabVIEW and no NI driver installed.
 
 ## The problem
 
@@ -11,8 +11,8 @@ reader, a log parser, a tool that shells out to LabVIEW) is a bare integer such 
 dialog or reading the `errors` files that NI software installs, and neither exists on a plain
 Python machine or a CI runner.
 
-`lverror` carries NI's text for 888 common codes inside the package, word for word, and
-classifies every other code by the numeric range it falls in.
+`lverror` carries a description of 888 common codes inside the package, and classifies every
+other code by the numeric range it falls in.
 
 ## Install
 
@@ -27,7 +27,7 @@ Pure standard library, no runtime dependencies, Python 3.10 or newer, fully type
 ```python
 import lverror
 
-assert lverror.explain(-1073807339) == "Timeout expired before operation completed."
+assert lverror.explain(-1073807339) == "The operation did not finish before the timeout elapsed."
 assert lverror.explain(-200300) is None  # not in the shipped sources
 
 info = lverror.describe(-200300)
@@ -35,20 +35,20 @@ assert (info.family, info.is_error) == ("NI-DAQmx", True)  # still classified by
 
 assert lverror.parse_code("0xBFFF0015") == -1073807339  # the hex form NI dialogs show
 assert lverror.format_line(56) == (
-    "56 (error, network): The network operation exceeded the user-specified or system time limit."
+    "56 (error, network): The network operation took longer than the time limit set by the user or the system."
 )
-assert [rec.code for rec in lverror.search("timeout expired")] == [-1073807339]
+assert [rec.code for rec in lverror.search("before the timeout")] == [-1073807339]
 assert lverror.is_warning(1073676294)  # a VISA completion code, not an error
-assert lverror.TABLE[14001].message == "Invalid refnum."
+assert lverror.TABLE[14001].message == "The refnum is not valid."
 ```
 
 The same lookups work from a shell:
 
 ```
 $ lverror 0xBFFF0015
--1073807339 (error, VISA): Timeout expired before operation completed.
+-1073807339 (error, VISA): The operation did not finish before the timeout elapsed.
 $ lverror --search "synchronous poke"
-14014 (error, DDE): A request for a synchronous poke transaction has timed out.
+14014 (error, DDE): A synchronous poke transaction request ran out of time.
 $ lverror -200300
 -200300 (error, NI-DAQmx): no documented message, classified by range only
 ```
@@ -57,28 +57,26 @@ Every function, the range table, the error rules and the command-line tool are c
 the [guide](https://github.com/JaviLianes8/lverror/blob/main/GUIDE.md). Changes are listed in
 the [changelog](https://github.com/JaviLianes8/lverror/blob/main/CHANGELOG.md).
 
-## Where the text comes from
+## Where the descriptions come from
 
-Every message is NI's text, copied verbatim (the NI-DAQmx text through the LabVIEW Wiki,
-which reproduces it) and checked by the test suite against captured
-sources whose origin, size and SHA-256 are recorded in `tests/fixtures/sources/MANIFEST.json`:
+The messages are written for this library, matching the meaning of NI's error descriptions;
+they are not NI's text. Each shipped code is one NI documents, and the test suite checks every
+message against a copy of the NI source kept with the tests (not distributed): the code must
+be there, and the message must not repeat NI's wording. The sources are:
 
 - 729 codes from the error file LabVIEW 2026 installs (`LabVIEW-errors.txt`), 99 VISA codes
-  from the NI-VISA error file and 2 from the NI-PAL error file, read on a machine with
-  LabVIEW 2026 installed.
+  from the NI-VISA error file and 2 from the NI-PAL error file.
 - 41 NI-DAQmx codes from the
-  [LabVIEW Wiki NI-DAQmx error page](https://labviewwiki.org/wiki/NI-DAQmx_Error_Code_Family),
-  which reproduces NI's DAQmx error text.
+  [LabVIEW Wiki NI-DAQmx error page](https://labviewwiki.org/wiki/NI-DAQmx_Error_Code_Family).
 - 17 instrument driver codes that LabVIEW 2026 no longer lists, from Table 5 of NI's 1997
-  "LabVIEW Error Codes" manual (part number 321551A-01).
+  "LabVIEW Error Codes" manual.
 
-Only the `LabVIEW: (Hex 0x7)` style prefix and NI's bold tags are removed, and line breaks
-and runs of spaces become single spaces. Where NI lists one
-code twice with two meanings (serial and network codes 61 to 65, for example), both are kept,
-joined by `Also:`. A code outside these sources has no message: `explain` returns `None`,
-while `describe` still reports its family. The full NI code set runs to tens of thousands of
-mostly driver-specific entries; this package ships the general LabVIEW, VISA, common NI-DAQmx,
-instrument driver, AppleEvent, PPC, DDE and networking codes a Python caller usually meets.
+Where NI documents two meanings for one code (serial and network codes 61 to 65, for
+example), the message gives both, joined by `Also:`. A code outside these sources has no
+message: `explain` returns `None`, while `describe` still reports its family. The full NI code
+set runs to tens of thousands of mostly driver-specific entries; this package covers the
+general LabVIEW, VISA, common NI-DAQmx, instrument driver, AppleEvent, PPC, DDE and networking
+codes a Python caller usually meets.
 
 ## Why lverror
 
@@ -109,11 +107,7 @@ not shipped.
 
 ## License
 
-MIT. See [LICENSE](https://github.com/JaviLianes8/lverror/blob/main/LICENSE). The messages
-are NI's text, quoted to identify the codes they describe, and are not covered by the MIT
-license; the NI-DAQmx messages come from the LabVIEW Wiki under the Creative Commons
-Attribution 3.0 License. See
-[NOTICE](https://github.com/JaviLianes8/lverror/blob/main/NOTICE) for the details.
+MIT. See [LICENSE](https://github.com/JaviLianes8/lverror/blob/main/LICENSE).
 
 ## Links
 

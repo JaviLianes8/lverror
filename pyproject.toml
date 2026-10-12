@@ -9,7 +9,7 @@ description = "Offline lookup that turns a LabVIEW or NI error code into NI's ow
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
-license-files = ["LICENSE", "NOTICE"]
+license-files = ["LICENSE"]
 authors = [{ name = "Javier Lianes", email = "javier@lianes8studio.com" }]
 keywords = [
     "labview",
@@ -61,16 +61,14 @@ packages = ["src/lverror"]
 only-include = [
     "src/lverror",
     "tests",
-    "scripts/build_messages.py",
-    "scripts/capture_sources.py",
     "README.md",
     "GUIDE.md",
     "CHANGELOG.md",
     "LICENSE",
-    "NOTICE",
     "pyproject.toml",
 ]
-exclude = ["**/__pycache__", "**/*.pyc"]
+# The captured NI sources are test-side references only; they are not distributed.
+exclude = ["**/__pycache__", "**/*.pyc", "tests/fixtures/sources"]
 
 [tool.ruff]
 line-length = 100

@@ -13,14 +13,14 @@ from ._validate import as_code
 class ErrorInfo:
     """What is known about one LabVIEW or NI error code.
 
-    ``message`` is NI's text for the code, or ``None`` when no captured NI source documents
-    it. ``family`` names the range the code falls in, or is ``None`` when the code sits
+    ``message`` is the library's description of the code, or ``None`` when no NI source
+    documents it. ``family`` names the range the code falls in, or is ``None`` when the code sits
     outside every known range. ``is_error`` and ``is_warning`` follow :func:`is_error`.
     Instances are immutable, compare by value and are hashable.
 
     >>> info = describe(-1073807339)
     >>> isinstance(info, ErrorInfo), info.message
-    (True, 'Timeout expired before operation completed.')
+    (True, 'The operation did not finish before the timeout elapsed.')
     >>> (info.code, info.family, info.is_error, info.is_warning)
     (-1073807339, 'VISA', True, False)
     """
@@ -46,7 +46,7 @@ def explain(code: SupportsIndex) -> str | None:
     if it is outside the signed 32-bit range every LabVIEW error code fits in.
 
     >>> explain(-200088)
-    'Task specified is invalid or does not exist.'
+    'The task is not valid or does not exist.'
     >>> explain(-200300) is None
     True
     """

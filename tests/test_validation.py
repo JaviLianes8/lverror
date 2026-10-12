@@ -163,4 +163,4 @@ def test_unknown_code_error_message_stays_short() -> None:
 
 
 def test_table_index_type_accepts_integer_like_keys_statically() -> None:
-    assert lverror.TABLE[Index(14001)].message == "Invalid refnum."
+    assert lverror.TABLE[Index(14001)].message == "The refnum is not valid."

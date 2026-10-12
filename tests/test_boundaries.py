@@ -81,7 +81,7 @@ def test_every_entry_is_tagged_with_the_source_its_code_belongs_to() -> None:
 
 def test_search_query_is_stripped() -> None:
     assert lverror.search(" ") == []
-    assert lverror.search("  timeout expired  ") == lverror.search("timeout expired")
+    assert lverror.search("  before the timeout  ") == lverror.search("before the timeout")
 
 
 def test_limit_is_checked_even_for_an_empty_query() -> None:

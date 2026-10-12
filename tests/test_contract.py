@@ -134,7 +134,7 @@ def test_nearest_promise() -> None:
 def test_format_line_promise() -> None:
     line = lverror.format_line(7)
     assert line.startswith("7 ")
-    assert "File not found" in line
+    assert "file could not be found" in line
 
 
 def test_parse_code_promise() -> None:

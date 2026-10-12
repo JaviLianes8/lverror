@@ -27,7 +27,7 @@ def format_line(code: SupportsIndex) -> str:
     ``no documented information``. ``code`` is checked as in :func:`explain`.
 
     >>> format_line(-1073807339)
-    '-1073807339 (error, VISA): Timeout expired before operation completed.'
+    '-1073807339 (error, VISA): The operation did not finish before the timeout elapsed.'
     >>> format_line(-200300)
     '-200300 (error, NI-DAQmx): no documented message, classified by range only'
     >>> format_line(0)

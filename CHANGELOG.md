@@ -10,18 +10,19 @@ All notable changes to this project are documented here. The format follows
 
 The public API is now stable: the names in `lverror.__all__`, their signatures, the five
 `ErrorInfo` fields, the family names and their order, the error types listed below, and the
-command-line options and exit codes. Message text follows NI's sources and may change when
-NI changes it.
+command-line options and exit codes. The wording of the descriptions may still be improved in
+any release.
 
 ### Changed
 
-- Every message is now NI's own text, word for word. 0.3.0 shipped 888 messages of which
-  only 224 matched NI exactly; the rest were shortened or reworded, some from older NI
-  wording (VISA -1073807239, for example, now reads as the installed NI-VISA file has it).
-  The text now comes from the error files LabVIEW 2026, NI-VISA and NI-PAL install, the
-  LabVIEW Wiki NI-DAQmx page and NI's 1997 instrument driver table, captured with their origin and checksum in `tests/fixtures/sources`. The set
-  of 888 codes is unchanged.
-- Codes NI lists twice keep both meanings, joined by `Also:` (2 and 61 to 65).
+- Every description is rewritten for this library, matching the meaning of NI's error
+  descriptions without reusing NI's wording. 0.3.0 mixed text close to NI's with shortened or
+  reworded messages, some of which no longer matched NI's current meaning (VISA -1073807239,
+  for example, now describes the secure-connection error the installed NI-VISA file names).
+  Each description was checked against NI's sources (the error files LabVIEW 2026, NI-VISA and
+  NI-PAL install, the LabVIEW Wiki NI-DAQmx page and NI's 1997 instrument driver table), which
+  the tests keep as references; they are not distributed. The set of 888 codes is unchanged.
+- Codes NI documents with two meanings give both, joined by `Also:` (2 and 61 to 65).
 - `is_error` reports every positive code NI's LabVIEW 2026 error file lists as an error
   (unless NI's text calls it a warning) even when its text is not shipped; 0.3.0 reported 369
   of them, such as 1612, as warnings. The list ships as code numbers only.

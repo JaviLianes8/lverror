@@ -100,11 +100,6 @@ def test_range_message_names_the_bits_needed() -> None:
         lverror.explain(2**31)
 
 
-def test_notice_keeps_the_ni_text_outside_the_mit_grant() -> None:
-    notice = (Path(__file__).resolve().parent.parent / "NOTICE").read_text(encoding="utf-8")
-    assert "which is not covered by that license" in " ".join(notice.split())
-
-
 def test_usage_names_the_program_lverror() -> None:
     result = run_cli("--bogus")
     assert result.returncode == 2

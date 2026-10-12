@@ -1,10 +1,10 @@
 """Offline LabVIEW and NI error code lookup.
 
-Turn a numeric LabVIEW or NI error code into NI's own description without LabVIEW or any NI
-driver installed. The text ships inside the package, copied word for word from the error
-files LabVIEW 2026, NI-VISA and NI-PAL install, the LabVIEW Wiki NI-DAQmx page and NI's 1997
-instrument driver table. Every other code is still classified by the range, or family, it
-falls in. No description is written by hand.
+Turn a numeric LabVIEW or NI error code into a plain-English description without LabVIEW or
+any NI driver installed. The descriptions ship inside the package; they are written for this
+library and match the meaning of NI's error descriptions (the error files LabVIEW 2026, NI-VISA
+and NI-PAL install, the LabVIEW Wiki NI-DAQmx page and NI's 1997 instrument driver table).
+Every other code is still classified by the range, or family, it falls in.
 
 Besides the single-code helpers (:func:`explain`, :func:`describe`), the package offers
 reverse search (:func:`search`), family queries (:func:`in_family`, :func:`families`),
@@ -14,7 +14,7 @@ nearest-known lookup (:func:`nearest`), whole-table iteration (:func:`records`,
 
 >>> import lverror
 >>> lverror.explain(lverror.parse_code("0xBFFF0015"))
-'Timeout expired before operation completed.'
+'The operation did not finish before the timeout elapsed.'
 """
 
 from __future__ import annotations

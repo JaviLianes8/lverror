@@ -59,7 +59,7 @@ class ErrorTable(Mapping[int, ErrorInfo]):
     ascending order. Use the shared :data:`TABLE` instance.
 
     >>> isinstance(TABLE, ErrorTable), TABLE[14001].message
-    (True, 'Invalid refnum.')
+    (True, 'The refnum is not valid.')
     >>> 7 in TABLE, -200300 in TABLE, TABLE.get(-200300)
     (True, False, None)
     """
