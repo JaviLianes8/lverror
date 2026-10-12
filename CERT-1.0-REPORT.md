@@ -13,6 +13,9 @@ Progress:
 - [x] Independent reviewer and five QA lenses report PASS (items 16, 19)
 - [x] Gates (item 15)
 - [x] PR and trace guard (item 17); merge and publish pending
+- [x] Owner decision: descriptions rewritten in the library's own words, NI sources test-side only
+- [ ] Lenses a, b, d re-run as fresh agents on the rewritten descriptions
+- [ ] Report, CHANGELOG and guard updated after the rewrite
 
 ## Scorecard (author)
 
