@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 import pytest
-from _cli_command import run_cli
+from _cli_command import cli_command, run_cli
 
 import lverror
 
@@ -135,3 +135,23 @@ def test_unknown_family_exits_two() -> None:
     result = run_cli("--family", "GPIB")
     assert result.returncode == 2
     assert result.stderr.startswith("lverror: unknown family 'GPIB'; known families are: VISA")
+
+
+@pytest.mark.parametrize("args", [["--search", "a"], ["--family", "VISA", "--json"]])
+def test_a_reader_that_stops_early_gets_no_traceback(args: list[str]) -> None:
+    env = dict(os.environ)
+    package_parent = str(Path(lverror.__file__).resolve().parent.parent)
+    env["PYTHONPATH"] = package_parent + os.pathsep + env.get("PYTHONPATH", "")
+    with subprocess.Popen(
+        [*cli_command(), *args],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=env,
+    ) as proc:
+        assert proc.stdout is not None and proc.stderr is not None
+        assert proc.stdout.readline()
+        proc.stdout.close()
+        err = proc.stderr.read().decode("utf-8", "replace")
+        code = proc.wait(timeout=60)
+    assert "Traceback" not in err, err
+    assert code in (0, 1)

@@ -47,4 +47,5 @@ def as_text(value: object, what: str) -> str:
     """Return ``value`` if it is a ``str``, otherwise raise ``TypeError`` naming ``what``."""
     if not isinstance(value, str):
         raise TypeError(f"{what} must be a str, not {type(value).__name__}")
-    return value
+    # A plain copy, so a str subclass cannot override strip or casefold on the way in.
+    return str.__str__(value)

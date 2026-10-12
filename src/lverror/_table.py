@@ -17,6 +17,8 @@ from ._core import ErrorInfo, describe
 from ._data import MESSAGES
 from ._validate import shorten
 
+_CODES: tuple[int, ...] = tuple(sorted(MESSAGES))
+
 
 class UnknownCodeError(KeyError):
     """Raised when a key that is not a documented code is looked up in an ``ErrorTable``.
@@ -33,6 +35,9 @@ class UnknownCodeError(KeyError):
 
     def __str__(self) -> str:
         return shorten(self.args[0]) if self.args else ""
+
+    def __repr__(self) -> str:
+        return f"UnknownCodeError({self!s})"
 
 
 def _member(key: object) -> int | None:
@@ -59,10 +64,7 @@ class ErrorTable(Mapping[int, ErrorInfo]):
     (True, False, None)
     """
 
-    __slots__ = ("_codes",)
-
-    def __init__(self) -> None:
-        self._codes: tuple[int, ...] = tuple(sorted(MESSAGES))
+    __slots__ = ()
 
     def __getitem__(self, code: SupportsIndex) -> ErrorInfo:
         member = _member(code)
@@ -71,16 +73,16 @@ class ErrorTable(Mapping[int, ErrorInfo]):
         return describe(member)
 
     def __iter__(self) -> Iterator[int]:
-        return iter(self._codes)
+        return iter(_CODES)
 
     def __len__(self) -> int:
-        return len(self._codes)
+        return len(_CODES)
 
     def __contains__(self, code: object) -> bool:
         return _member(code) is not None
 
     def __repr__(self) -> str:
-        return f"ErrorTable({len(self._codes)} documented codes)"
+        return f"ErrorTable({len(_CODES)} documented codes)"
 
 
 # The shared, read-only table of every documented code.

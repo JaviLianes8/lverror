@@ -53,7 +53,8 @@ assert lverror.explain(65) == (
 Every function that takes a code accepts an `int`, or any integer-like object (an
 `IntEnum` member, a NumPy integer: anything with `__index__`). It refuses `bool`, floats and
 strings with `TypeError`, and a value outside the signed 32-bit range that every LabVIEW
-error code fits in with `ValueError`. Use `parse_code` for text.
+error code fits in with `ValueError`. An exception raised by the argument's own `__index__`
+propagates unchanged, as it does for `int()` and list indexing. Use `parse_code` for text.
 
 ```python
 import enum

@@ -65,3 +65,23 @@ def test_a_key_whose_repr_fails_is_named_by_its_type() -> None:
 
 def test_search_casefolds_as_documented() -> None:
     assert lverror.search(chr(0xDF)) == lverror.search("ss") != []
+
+
+def test_unknown_code_error_repr_is_short() -> None:
+    assert repr(lverror.UnknownCodeError(-200300)) == "UnknownCodeError(-200300)"
+    assert len(repr(lverror.UnknownCodeError("x" * 1_000_000))) < 80
+    assert repr(lverror.UnknownCodeError(2**100_000)) == "UnknownCodeError(<int of 100001 bits>)"
+
+
+class _LyingStr(str):
+    def strip(self, chars: str | None = None) -> str:
+        raise RuntimeError("lying strip")
+
+    def casefold(self) -> str:
+        raise RuntimeError("lying casefold")
+
+
+def test_str_subclasses_cannot_override_the_text_handling() -> None:
+    assert lverror.parse_code(_LyingStr(" 7 ")) == 7
+    assert lverror.search(_LyingStr("timeout expired")) == lverror.search("timeout expired")
+    assert lverror.in_family(_LyingStr(" dde ")) == lverror.in_family("DDE")
