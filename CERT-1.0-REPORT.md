@@ -14,8 +14,8 @@ Progress:
 - [x] Gates (item 15)
 - [x] PR and trace guard (item 17); merge and publish pending
 - [x] Owner decision: descriptions rewritten in the library's own words, NI sources test-side only
-- [ ] Lenses a, b, d re-run as fresh agents on the rewritten descriptions
-- [ ] Report, CHANGELOG and guard updated after the rewrite
+- [x] Lenses a, b, d re-run as fresh agents on the rewritten descriptions
+- [x] Report, CHANGELOG and guard updated after the rewrite
 
 ## Scorecard (author)
 
@@ -26,16 +26,16 @@ Progress:
 | 3 | Docstring with runnable example, doctests pass | PASS | `test_docs` (every module doctested, every name has `>>>` and appears in an example); README and GUIDE blocks and `$ lverror` transcripts executed |
 | 4 | Typed end to end | PASS | `mypy --strict src tests` exit 0; `py.typed` in the wheel; external strict consumer clean (lens a) |
 | 5 | Typed, documented, safe errors | PASS | `test_validation`, `test_round2_contracts`, `test_round4_contracts`: messages bounded for 10 MB strings and 100000-bit integers, failing reprs handled |
-| 6 | Contract asserts the full promise | PASS | 384 tests; a promise test per public name plus boundary contracts from five blind rounds |
-| 7 | Real ground truth | PASS | 888 of 888 messages equal NI's text in the error files LabVIEW 2026, NI-VISA and NI-PAL install on this PC (830), the LabVIEW Wiki DAQmx page (41) and NI's 1997 manual (17, hand-paired and labelled); excerpts with size, SHA-256 and date in `MANIFEST.json`; NI docs pages used as an independent oracle by lens b |
+| 6 | Contract asserts the full promise | PASS | 386 tests; a promise test per public name plus boundary contracts from five blind rounds |
+| 7 | Real ground truth | PASS | Every one of the 888 codes is documented by a captured NI source: the error files LabVIEW 2026, NI-VISA and NI-PAL install on this PC (830), the LabVIEW Wiki DAQmx page (41) and NI's 1997 manual (17, hand-paired and labelled), with size, SHA-256 and date in `MANIFEST.json`; the descriptions are the library's own words, read against NI's meaning for all 888 codes by lens b; families and error/warning classification derived from NI's lists |
 | 8 | Real e2e incl. PyPI upgrade | PASS | Wheel in clean venvs, suite from the sdist with `src` removed, a sabotaged installed CLI fails 18 of 20 CLI tests (the other two only check for no traceback), PyPI 0.3.0 upgraded in place matches CHANGELOG (lens d, reviewer) |
 | 9 | Seeded fuzz, no crash, hang or blow-up | PASS | `test_fuzz.py` (seed 20261012) against brute-force references; lens c: 780000 random string calls, linear scaling to 10 million characters, 8-thread consistency |
 | 10 | Every interpreter on this PC | PASS | 3.10.19, 3.11.5, 3.12.12, 3.13.2, 3.14.2 green against the installed wheel (359 tests at 5af5bb2 by lens d, 372 at 0a4dfc8 by the reviewer) |
 | 11 | README | PASS | `twine check --strict` PASSED; absolute links tested; problem, why (PyPI facts checked by downloading the wheels), install, quick start, GUIDE and CHANGELOG links |
 | 12 | CHANGELOG dated 1.0.0 | PASS | `## [1.0.0] - 2026-10-12` with the stable surface and every behaviour change |
 | 13 | pyproject | PASS | 1.0.0, Production/Stable, 3.10 to 3.14, MIT, Homepage/Source/Issues/Changelog, keywords, `dependencies = []` (contract-tested) |
-| 14 | sdist and wheel contents | PASS | Wheel: modules, data file, `py.typed`, LICENSE, NOTICE; sdist adds tests, fixtures and the two data scripts; NOTICE covers the NI text and the CC BY 3.0 wiki data |
-| 15 | Gates exit 0 alone | PASS | `ruff format --check .` 0, `ruff check .` 0, `mypy --strict src` 0, `pytest` 0 (384 passed), each run alone |
+| 14 | sdist and wheel contents | PASS | Wheel: modules, data file, `py.typed`, LICENSE; sdist adds the tests but not the captured NI sources or the scripts; no NI text ships, so no third-party notice is needed |
+| 15 | Gates exit 0 alone | PASS | `ruff format --check .` 0, `ruff check .` 0, `mypy --strict src` 0, `pytest` 0 (386 passed), each run alone |
 | 16 | Independent reviewer | PASS | items 1 to 18 PASS at 0a4dfc8, no failures |
 | 17 | PR, trace guard | ready | PR #3 from `release/1.0.0`, trace guard CLEAN; merge and PyPI publish are left to the maintainer |
 | 18 | Mutation round | PASS | author round: 34 mutations, 4 survivors closed, 1 equivalent; blind lens (e): five rounds, 165 new mutations, every non-equivalent survivor closed |
@@ -179,3 +179,44 @@ the first item 16 reviewer were cut by a usage limit and relaunched fresh.
 - Code arguments are now validated (`bool`, floats and strings raise `TypeError`, values
   outside int32 raise `ValueError`); 0.3.0 silently looked up `True` as code 1.
 - The README links to GUIDE.md and NOTICE on `main`, so publish after the merge.
+
+## Owner decision: descriptions in the library's own words
+
+After the first certification pass the owner decided the package must not ship NI's wording.
+What changed:
+
+- All 888 descriptions were rewritten to match the meaning of NI's error descriptions in new
+  wording, then a second pass rewrote the 214 that stayed close to NI's sentences. 885 differ
+  from 0.3.0; three (1042, 1421, 1504) were already in the library's own words.
+- New contracts in `tests/test_ground_truth.py`, enforced also by `scripts/refresh_data.py`: no
+  description equals its NI source after normalising case and punctuation, shares a run of six
+  or more consecutive words with it, or reaches a character similarity of 0.75 (difflib ratio on
+  normalised text, autojunk off); and no description shares eight consecutive words with any
+  captured NI entry. Highest similarity now 0.706 (code 14016); longest shared run 4 words.
+- Codes, families, ranges and the error/warning classification are unchanged: they are bare
+  facts derived from NI's lists (61,750 codes compared with the earlier certified state).
+- The captured NI sources stay in `tests/fixtures/sources` as test-side references only; the
+  sdist excludes them and the data scripts, and the tests that need them skip when absent
+  (23 tests in an extracted sdist). NOTICE was removed: no NI or wiki text ships.
+- README, GUIDE, docstrings, the PyPI summary and CHANGELOG say the messages are written for
+  this library, matching the meaning of NI's error descriptions.
+
+Re-run as fresh agents on the rewritten descriptions:
+
+| Lens | First verdict | Findings | Final verdict |
+| --- | --- | --- | --- |
+| a. API and docs | FAIL | PyPI summary and two docstrings still claimed NI text; CHANGELOG counts; code 2 and `%s` placeholders; later, some second-pass rewrites read worse ("is wrong", chatty openings) | PASS at 7cc4c3f: docs, transcripts, doctests, strict consumer, CHANGELOG against PyPI 0.3.0 (885 changed, 3 unchanged), clarity of every changed description |
+| b. Correctness and ground truth | FAIL | 28 near-verbatim short descriptions, three meaning errors (1128, 1319, 1353), one sentence equal to another code's NI text; then the similarity check missed long texts (difflib autojunk) and 1761 was over the limit | PASS at 7cc4c3f: all 888 descriptions read against NI's meaning, similarity rules re-implemented independently, planted copies (short, long, cross-code) all caught, derived facts unchanged, no NI sentence in either archive |
+| d. Packaging and real e2e | FAIL | PyPI summary still claimed NI text | PASS at 96aad22: no NI sources, scripts or NOTICE in either archive, 362 passed and 5 skipped from the sdist on 3.10 to 3.14 against the installed wheel, sabotaged CLI caught, 0.3.0 upgrade matches CHANGELOG |
+
+Lenses c and e and the item 16 reviewer were not re-run: the rewrite changed data text and
+documentation only, not code paths, and the gates, the mutation contracts and the full suite
+(386 tests) stay green.
+
+## Decisions for the maintainer after the rewrite
+
+- The earlier "NI text verbatim" and NOTICE decisions above are superseded by this section.
+- Branch history still contains the NI text from the first pass (commits before 321c4eb). A
+  squash merge keeps it out of `main`'s history; a merge commit would bring it in.
+- Message wording is now ours to improve; the tests only guard the distance from NI's wording
+  and the code set, not the exact sentences (apart from the few quoted in docs and tests).
