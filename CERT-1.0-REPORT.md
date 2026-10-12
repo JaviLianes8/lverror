@@ -16,6 +16,7 @@ Progress:
 - [x] Owner decision: descriptions rewritten in the library's own words, NI sources test-side only
 - [x] Lenses a, b, d re-run as fresh agents on the rewritten descriptions
 - [x] Report, CHANGELOG and guard updated after the rewrite
+- [x] NI and wiki source copies removed from the repository (local test references only)
 
 ## Scorecard (author)
 
@@ -220,3 +221,22 @@ documentation only, not code paths, and the gates, the mutation contracts and th
   squash merge keeps it out of `main`'s history; a merge commit would bring it in.
 - Message wording is now ours to improve; the tests only guard the distance from NI's wording
   and the code set, not the exact sentences (apart from the few quoted in docs and tests).
+
+## NI source copies kept out of the repository
+
+Owner decision before the merge: NI's and the LabVIEW Wiki's texts must not be in the public
+repository either. The captured copies in `tests/fixtures/sources` are no longer tracked and
+the folder is ignored by git, except `MANIFEST.json` (origins, sizes, SHA-256, no NI text) and
+`labview-positive-codes.txt` (code numbers only). `scripts/capture_sources.py` re-creates the
+rest on a machine with LabVIEW 2026 and NI-VISA, network access and `pdftotext`; it now also
+writes the 1997 instrument driver pairs itself, parsed from `pdftotext -raw` (identical to the
+earlier hand pairing). CONTRIBUTING explains the steps.
+
+- Without the copies, `tests/test_ground_truth.py` and `tests/test_ranges_truth.py` skip as
+  modules (18 tests); a fresh clone of the branch from GitHub gives 368 passed, 2 skipped. With
+  the copies present, 386 passed.
+- No tracked file shares eight consecutive words with any NI or wiki entry of the captured
+  copies.
+- The squash merge planned by the coordinator keeps the earlier commits that carried NI text
+  out of `main`.
+
