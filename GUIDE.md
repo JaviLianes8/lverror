@@ -243,5 +243,5 @@ DDE
 general LabVIEW
 ```
 
-Before Python 3.13, argparse takes a negative hex code for an option; put it after `--`:
-`lverror -- -0x10`.
+Older Python versions (3.13 and earlier) take a negative hex code for an option; put it
+after `--`: `lverror -- -0x10`.

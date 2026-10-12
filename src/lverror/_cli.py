@@ -28,7 +28,7 @@ Examples:
   lverror --family VISA     list every documented code in a family
   lverror --list-families   show the known family names
   lverror 7 --json          machine-readable output
-  lverror -- -0x10          a negative hex code goes after -- (before Python 3.13)
+  lverror -- -0x10          a negative hex code goes after --
 """
 
 
