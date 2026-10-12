@@ -215,8 +215,8 @@ assert lverror.format_line(0) == "0 (success, unknown family): no documented inf
 
 The `lverror` command (also `python -m lverror`) runs one action per call: a code, `--search
 TEXT`, `--family NAME` or `--list-families`; add `--json` for machine output. It exits `0`
-when it finds information, `1` when a code, a search or a family finds none, and `2` on bad
-input, including two actions at once.
+when it finds information, `1` when a code, a search or a known family finds none, and `2`
+on bad input, including an unknown family name and two actions at once.
 
 ```
 $ lverror 14001

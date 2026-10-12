@@ -85,3 +85,12 @@ def test_str_subclasses_cannot_override_the_text_handling() -> None:
     assert lverror.parse_code(_LyingStr(" 7 ")) == 7
     assert lverror.search(_LyingStr("timeout expired")) == lverror.search("timeout expired")
     assert lverror.in_family(_LyingStr(" dde ")) == lverror.in_family("DDE")
+
+
+def test_the_third_party_notice_ships_with_the_package() -> None:
+    root = Path(__file__).resolve().parent.parent
+    pyproject = (root / "pyproject.toml").read_text(encoding="utf-8")
+    assert 'license-files = ["LICENSE", "NOTICE"]' in pyproject
+    notice = (root / "NOTICE").read_text(encoding="utf-8")
+    assert "National Instruments" in notice
+    assert "https://creativecommons.org/licenses/by/3.0/" in notice

@@ -39,7 +39,9 @@ def as_code(value: object) -> int:
         raise TypeError(f"an error code must be an integer, not {name}") from None
     if not INT32_MIN <= code <= INT32_MAX:
         # The value itself is not echoed: a huge integer cannot even be printed cheaply.
-        raise ValueError(f"error code out of the signed 32-bit range ({code.bit_length()} bits)")
+        raise ValueError(
+            f"error code out of the signed 32-bit range (the value needs {code.bit_length()} bits)"
+        )
     return code
 
 

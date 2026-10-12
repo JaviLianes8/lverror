@@ -52,6 +52,8 @@ def test_module_form_runs_the_same_tool() -> None:
         [sys.executable, "-m", "lverror", "7"], capture_output=True, text=True, env=env
     )
     assert result.returncode == 0, result.stderr
+    expected = f"7 (error, general LabVIEW): {_source_text('labview-errors', 7)}\n"
+    assert result.stdout == expected
     assert result.stdout == run_cli("7").stdout
 
 

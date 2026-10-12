@@ -9,7 +9,7 @@ description = "Offline lookup that turns a LabVIEW or NI error code into NI's ow
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
-license-files = ["LICENSE"]
+license-files = ["LICENSE", "NOTICE"]
 authors = [{ name = "Javier Lianes", email = "javier@lianes8studio.com" }]
 keywords = [
     "labview",
@@ -67,6 +67,7 @@ only-include = [
     "GUIDE.md",
     "CHANGELOG.md",
     "LICENSE",
+    "NOTICE",
     "pyproject.toml",
 ]
 exclude = ["**/__pycache__", "**/*.pyc"]

@@ -110,7 +110,10 @@ not shipped.
 ## License
 
 MIT. See [LICENSE](https://github.com/JaviLianes8/lverror/blob/main/LICENSE). The messages
-are NI's text, quoted to identify the codes they describe.
+are NI's text, quoted to identify the codes they describe, and are not covered by the MIT
+license; the NI-DAQmx messages come from the LabVIEW Wiki under the Creative Commons
+Attribution 3.0 License. See
+[NOTICE](https://github.com/JaviLianes8/lverror/blob/main/NOTICE) for the details.
 
 ## Links
 
