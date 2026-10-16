@@ -1,5 +1,7 @@
 # lverror
 
+[![Lianes8 Certified](https://lianes8studio.com/certified/lianes8-certified-badge.svg)](https://lianes8studio.com/certified)
+
 Offline lookup that turns a LabVIEW or NI error code into a plain-English description, with
 no LabVIEW and no NI driver installed.
 
